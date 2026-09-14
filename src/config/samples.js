@@ -8,10 +8,46 @@ export const GROUPS = [
     hasNotes: false,
     color: '#ff6b2b',
     lanes: [
-      { id: 'kick',  name: 'Kick',   sample: new URL('../assets/samples/Drums/Kick/KIC 1.wav',   import.meta.url).href },
-      { id: 'snare', name: 'Snare',  sample: new URL('../assets/samples/Drums/Snare/SNA 1.wav',  import.meta.url).href },
-      { id: 'hihat', name: 'Hi-Hat', sample: new URL('../assets/samples/Drums/HH/HAT 1.wav',     import.meta.url).href },
-      { id: 'crash', name: 'Crash',  sample: new URL('../assets/samples/Drums/Crash/CRASH1.wav', import.meta.url).href },
+      {
+        id: 'kick', name: 'Kick',
+        sample: new URL('../assets/samples/Drums/Kick/KIC 1.wav', import.meta.url).href,
+        options: [
+          { label: 'KIC 1', sample: new URL('../assets/samples/Drums/Kick/KIC 1.wav', import.meta.url).href },
+          { label: 'KIC 2', sample: new URL('../assets/samples/Drums/Kick/KIC 2.wav', import.meta.url).href },
+          { label: 'KIC 3', sample: new URL('../assets/samples/Drums/Kick/KIC 3.wav', import.meta.url).href },
+          { label: 'KIC 4', sample: new URL('../assets/samples/Drums/Kick/KIC 4.wav', import.meta.url).href },
+        ],
+      },
+      {
+        id: 'snare', name: 'Snare',
+        sample: new URL('../assets/samples/Drums/Snare/SNA 1.wav', import.meta.url).href,
+        options: [
+          { label: 'SNA 1', sample: new URL('../assets/samples/Drums/Snare/SNA 1.wav', import.meta.url).href },
+          { label: 'SNA 2', sample: new URL('../assets/samples/Drums/Snare/SNA 2.wav', import.meta.url).href },
+          { label: 'SNA 3', sample: new URL('../assets/samples/Drums/Snare/SNA 3.wav', import.meta.url).href },
+          { label: 'SNA 4', sample: new URL('../assets/samples/Drums/Snare/SNA 4.wav', import.meta.url).href },
+        ],
+      },
+      {
+        id: 'hihat', name: 'Hi-Hat',
+        sample: new URL('../assets/samples/Drums/HH/HAT 1.wav', import.meta.url).href,
+        options: [
+          { label: 'HAT 1', sample: new URL('../assets/samples/Drums/HH/HAT 1.wav', import.meta.url).href },
+          { label: 'HAT 2', sample: new URL('../assets/samples/Drums/HH/HAT 2.wav', import.meta.url).href },
+          { label: 'HAT 3', sample: new URL('../assets/samples/Drums/HH/HAT 3.wav', import.meta.url).href },
+          { label: 'HAT 4', sample: new URL('../assets/samples/Drums/HH/HAT 4.wav', import.meta.url).href },
+        ],
+      },
+      {
+        id: 'crash', name: 'Crash',
+        sample: new URL('../assets/samples/Drums/Crash/CRASH1.wav', import.meta.url).href,
+        options: [
+          { label: 'CRASH 1', sample: new URL('../assets/samples/Drums/Crash/CRASH1.wav', import.meta.url).href },
+          { label: 'CRASH 2', sample: new URL('../assets/samples/Drums/Crash/CRASH2.wav', import.meta.url).href },
+          { label: 'CRASH 3', sample: new URL('../assets/samples/Drums/Crash/CRASH3.wav', import.meta.url).href },
+          { label: 'CRASH 4', sample: new URL('../assets/samples/Drums/Crash/CRASH4.wav', import.meta.url).href },
+        ],
+      },
     ],
   },
   {

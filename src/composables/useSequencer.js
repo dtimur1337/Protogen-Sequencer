@@ -45,6 +45,9 @@ const selectedSample = reactive({ bass: 'bas2', melodics: 'syn1' })
 // Per-lane volume only
 const laneSettings = reactive({})
 
+// Per-lane selected sample URL (for lanes with multiple options)
+const laneSampleSelections = reactive({})
+
 function initState() {
   for (const group of GROUPS) {
     if (!groupVolumes[group.id])     groupVolumes[group.id]     = 80
@@ -55,6 +58,9 @@ function initState() {
       }
       if (!laneSettings[lane.id]) {
         laneSettings[lane.id] = { volume: 80 }
+      }
+      if (!laneSampleSelections[lane.id]) {
+        laneSampleSelections[lane.id] = lane.sample
       }
     }
   }
@@ -87,7 +93,7 @@ async function initAudio() {
     groupReverbSendGains[group.id] = revSend
 
     for (const lane of group.lanes) {
-      const sampler  = new Sampler({ urls: { [ROOT_NOTE]: lane.sample }, release: 0.5 })
+      const sampler  = new Sampler({ urls: { [ROOT_NOTE]: laneSampleSelections[lane.id] ?? lane.sample }, release: 0.5 })
       const laneGain = new Gain(laneSettings[lane.id].volume / 100)
       sampler.connect(laneGain)
       laneGain.connect(grpGain)
@@ -171,6 +177,98 @@ function setSelectedSample(groupId, sampleId) {
   selectedSample[groupId] = sampleId
 }
 
+function resetTrack() {
+  stop()
+  bpm.value = 120
+  masterVolume.value = 80
+  for (const group of GROUPS) {
+    groupVolumes[group.id] = 80
+    groupReverbSends[group.id] = 0
+    for (const lane of group.lanes) {
+      laneSettings[lane.id].volume = 80
+      if (!group.hasNotes) {
+        for (const pad of pads[lane.id]) pad.active = false
+        if (lane.options && laneSampleSelections[lane.id] !== lane.sample) {
+          setLaneSample(lane.id, lane.sample)
+        }
+      }
+    }
+  }
+  for (const gId of Object.keys(selectedSample)) {
+    const group = GROUPS.find(g => g.id === gId)
+    if (group) selectedSample[gId] = group.lanes[0].id
+  }
+  for (const group of GROUPS) {
+    if (group.hasNotes) {
+      for (let ni = 0; ni < PIANO_NOTES.length; ni++) {
+        for (let s = 0; s < STEPS; s++) pianoRoll[group.id][ni][s] = 0
+      }
+    }
+  }
+}
+
+async function loadPreset(preset) {
+  stop()
+  if (preset.bpm !== undefined) bpm.value = preset.bpm
+  if (preset.masterVolume !== undefined) masterVolume.value = preset.masterVolume
+  for (const group of GROUPS) {
+    if (preset.groupVolumes?.[group.id] !== undefined) groupVolumes[group.id] = preset.groupVolumes[group.id]
+    if (preset.groupReverbSends?.[group.id] !== undefined) groupReverbSends[group.id] = preset.groupReverbSends[group.id]
+    for (const lane of group.lanes) {
+      laneSettings[lane.id].volume = 80
+    }
+  }
+  if (preset.laneVolumes) {
+    for (const [laneId, vol] of Object.entries(preset.laneVolumes)) {
+      if (laneSettings[laneId]) laneSettings[laneId].volume = vol
+    }
+  }
+  if (preset.selectedSample) {
+    for (const [gId, sId] of Object.entries(preset.selectedSample)) selectedSample[gId] = sId
+  }
+  if (preset.laneOptionLabels) {
+    for (const group of GROUPS) {
+      for (const lane of group.lanes) {
+        const label = preset.laneOptionLabels[lane.id]
+        if (label && lane.options) {
+          const opt = lane.options.find(o => o.label === label)
+          if (opt) await setLaneSample(lane.id, opt.sample)
+        }
+      }
+    }
+  }
+  if (preset.pads) {
+    for (const [laneId, steps] of Object.entries(preset.pads)) {
+      if (pads[laneId]) {
+        for (let i = 0; i < steps.length; i++) pads[laneId][i].active = !!steps[i]
+      }
+    }
+  }
+  if (preset.pianoRoll) {
+    for (const [groupId, noteMap] of Object.entries(preset.pianoRoll)) {
+      for (let ni = 0; ni < PIANO_NOTES.length; ni++) {
+        for (let s = 0; s < STEPS; s++) pianoRoll[groupId][ni][s] = 0
+      }
+      for (const [noteName, steps] of Object.entries(noteMap)) {
+        const ni = PIANO_NOTES.indexOf(noteName)
+        if (ni === -1) continue
+        for (let s = 0; s < steps.length; s++) pianoRoll[groupId][ni][s] = steps[s]
+      }
+    }
+  }
+}
+
+async function setLaneSample(laneId, url) {
+  laneSampleSelections[laneId] = url
+  if (!audioInitialized) return
+  const oldSampler = samplers[laneId]
+  const newSampler = new Sampler({ urls: { [ROOT_NOTE]: url }, release: 0.5 })
+  newSampler.connect(volumeGains[laneId])
+  await toneLoaded()
+  samplers[laneId] = newSampler
+  oldSampler?.dispose()
+}
+
 async function previewNote(groupId, note) {
   if (!audioInitialized) await initAudio()
   const laneId = selectedSample[groupId]
@@ -186,9 +284,10 @@ export function useSequencer() {
   return {
     isPlaying, isLoading, currentStep, bpm, masterVolume,
     groupVolumes, groupReverbSends,
-    pads, pianoRoll, selectedSample, laneSettings,
+    pads, pianoRoll, selectedSample, laneSettings, laneSampleSelections,
     play, stop,
     togglePad, togglePianoNote, setPianoNote, setSelectedSample,
-    previewNote,
+    setLaneSample, previewNote,
+    resetTrack, loadPreset,
   }
 }

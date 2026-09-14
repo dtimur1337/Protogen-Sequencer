@@ -6,7 +6,18 @@
     @mouseup="endDrag"
     @mouseleave="endDrag"
   >
-    <div class="lane-name" aria-hidden="true">{{ lane.name }}</div>
+    <div class="lane-name-cell">
+      <select
+        v-if="lane.options"
+        class="lane-select"
+        :value="laneSampleSelections[lane.id]"
+        :aria-label="`Sample for ${lane.name}`"
+        @change="setLaneSample(lane.id, $event.target.value)"
+      >
+        <option v-for="opt in lane.options" :key="opt.sample" :value="opt.sample">{{ opt.label }}</option>
+      </select>
+      <span v-else class="lane-name">{{ lane.name }}</span>
+    </div>
 
     <div class="pads-area">
       <div v-for="(group, gi) in padGroups" :key="gi" class="pad-group">
@@ -52,7 +63,7 @@ defineProps({
   color: { type: String, default: '#ff6b2b' },
 })
 
-const { pads, laneSettings, currentStep, togglePad } = useSequencer()
+const { pads, laneSettings, laneSampleSelections, currentStep, togglePad, setLaneSample } = useSequencer()
 
 const padGroups = computed(() =>
   Array.from({ length: 4 }, (_, g) =>
@@ -97,20 +108,62 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   padding: 4px 0;
 }
 
-.lane-name {
+.lane-name-cell {
   width: 110px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+}
+
+.lane-name {
   font-family: 'Courier New', monospace;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-align: right;
   color: #7a9ab8;
-  padding-right: 12px;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.lane-select {
+  width: 100%;
+  background: #0d1522;
+  border: 1px solid #253550;
+  border-radius: 2px;
+  color: #7a9ab8;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 4px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='%235a7a9a' d='M0 0l4 5 4-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  padding-right: 18px;
+}
+
+.lane-select:hover {
+  border-color: #3a5878;
+  color: #9ab8d8;
+}
+
+.lane-select:focus {
+  border-color: #ff6b2b;
+}
+
+.lane-select option {
+  background: #0d1522;
+  color: #7a9ab8;
 }
 
 .pads-area {
