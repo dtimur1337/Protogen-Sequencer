@@ -271,7 +271,7 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 .roll-grid {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   width: fit-content;
   user-select: none;
 }
