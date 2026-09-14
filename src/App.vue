@@ -12,15 +12,12 @@
         <SequencerGrid />
       </v-container>
     </v-main>
-
-    <NotePickerModal />
   </v-app>
 </template>
 
 <script setup>
 import TransportBar from './components/TransportBar.vue'
 import SequencerGrid from './components/SequencerGrid.vue'
-import NotePickerModal from './components/NotePickerModal.vue'
 </script>
 
 <style scoped>

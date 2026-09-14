@@ -4,10 +4,10 @@ import { GROUPS, STEPS, ROOT_NOTE } from '../config/samples'
 
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
-function noteToMidi(note) {
-  const m = note.match(/^([A-G]#?)(\d)$/)
-  if (!m) return 48
-  return (parseInt(m[2]) + 1) * 12 + NOTE_NAMES.indexOf(m[1])
+// 36 notes: C2–B4
+export const PIANO_NOTES = []
+for (let oct = 2; oct <= 4; oct++) {
+  for (const n of NOTE_NAMES) PIANO_NOTES.push(`${n}${oct}`)
 }
 
 // --- Module-level singletons ---
@@ -23,15 +23,28 @@ const isPlaying = ref(false)
 const isLoading = ref(false)
 const currentStep = ref(-1)
 const bpm = ref(120)
+
+// Pad state for non-pitched groups (Drums, FX)
 const pads = reactive({})
+
+// Piano roll state for pitched groups (Bass, Melodics)
+// pianoRoll[groupId][noteIndex][stepIndex] = boolean
+const pianoRoll = reactive({
+  bass:     Array.from({ length: 36 }, () => Array.from({ length: STEPS }, () => false)),
+  melodics: Array.from({ length: 36 }, () => Array.from({ length: STEPS }, () => false)),
+})
+
+// Which sample is active per pitched group
+const selectedSample = reactive({ bass: 'bas1', melodics: 'syn1' })
+
+// Per-lane audio settings (used by all lanes, but pitched groups show selected lane's settings)
 const laneSettings = reactive({})
-const notePicker = reactive({ open: false, laneId: null, stepIndex: null })
 
 function initState() {
   for (const group of GROUPS) {
     for (const lane of group.lanes) {
-      if (!pads[lane.id]) {
-        pads[lane.id] = Array.from({ length: STEPS }, () => ({ active: false, note: ROOT_NOTE }))
+      if (!group.hasNotes && !pads[lane.id]) {
+        pads[lane.id] = Array.from({ length: STEPS }, () => ({ active: false }))
       }
       if (!laneSettings[lane.id]) {
         laneSettings[lane.id] = { volume: 80, reverbSend: 0 }
@@ -69,7 +82,6 @@ async function initAudio() {
 
   await toneLoaded()
 
-  // Live-update audio params when sliders move
   for (const group of GROUPS) {
     for (const lane of group.lanes) {
       watch(() => laneSettings[lane.id].volume,    (v) => { if (volumeGains[lane.id])    volumeGains[lane.id].gain.value    = v / 100 })
@@ -81,11 +93,19 @@ async function initAudio() {
     const step = _step
 
     for (const group of GROUPS) {
-      for (const lane of group.lanes) {
-        const pad = pads[lane.id]?.[step]
-        if (pad?.active && samplers[lane.id]) {
-          const note = group.hasNotes ? pad.note : ROOT_NOTE
-          try { samplers[lane.id].triggerAttack(note, time) } catch (_) {}
+      if (group.hasNotes) {
+        const laneId = selectedSample[group.id]
+        for (let ni = 0; ni < PIANO_NOTES.length; ni++) {
+          if (pianoRoll[group.id][ni][step]) {
+            try { samplers[laneId].triggerAttack(PIANO_NOTES[ni], time) } catch (_) {}
+          }
+        }
+      } else {
+        for (const lane of group.lanes) {
+          const pad = pads[lane.id]?.[step]
+          if (pad?.active && samplers[lane.id]) {
+            try { samplers[lane.id].triggerAttack(ROOT_NOTE, time) } catch (_) {}
+          }
         }
       }
     }
@@ -118,20 +138,12 @@ function togglePad(laneId, stepIndex) {
   if (pad) pad.active = !pad.active
 }
 
-function openNotePicker(laneId, stepIndex) {
-  notePicker.laneId = laneId
-  notePicker.stepIndex = stepIndex
-  notePicker.open = true
+function togglePianoNote(groupId, noteIndex, stepIndex) {
+  pianoRoll[groupId][noteIndex][stepIndex] = !pianoRoll[groupId][noteIndex][stepIndex]
 }
 
-function selectNote(note) {
-  if (notePicker.laneId !== null && notePicker.stepIndex !== null) {
-    const pad = pads[notePicker.laneId]?.[notePicker.stepIndex]
-    if (pad) pad.note = note
-  }
-  notePicker.open = false
-  notePicker.laneId = null
-  notePicker.stepIndex = null
+function setSelectedSample(groupId, sampleId) {
+  selectedSample[groupId] = sampleId
 }
 
 watch(bpm, (val) => { Transport.bpm.value = val })
@@ -141,7 +153,8 @@ initState()
 export function useSequencer() {
   return {
     isPlaying, isLoading, currentStep, bpm,
-    pads, laneSettings, notePicker,
-    play, stop, togglePad, openNotePicker, selectNote,
+    pads, pianoRoll, selectedSample, laneSettings,
+    play, stop,
+    togglePad, togglePianoNote, setSelectedSample,
   }
 }
