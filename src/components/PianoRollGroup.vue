@@ -32,7 +32,7 @@
         <div class="ctrl-row">
           <span class="ctrl-label">REV</span>
           <v-slider
-            v-model="laneSettings[selectedSample[group.id]].reverbSend"
+            v-model="groupReverbSends[group.id]"
             min="0" max="100" step="1"
             hide-details density="compact"
             color="secondary"
@@ -63,14 +63,15 @@
         role="row"
         :aria-label="note"
       >
-        <!-- Piano key strip -->
-        <div
+        <!-- Piano key strip — clickable to audition -->
+        <button
           class="key-strip"
           :class="{ 'key-strip--black': isBlack(note), 'key-strip--c': isC(note) }"
-          role="presentation"
+          :aria-label="`Play ${note}`"
+          @mousedown.prevent="previewNote(group.id, note)"
         >
           <span class="key-name">{{ keyLabel(note) }}</span>
-        </div>
+        </button>
 
         <!-- Step area: transparent click grid + note bars -->
         <div class="step-area">
@@ -125,7 +126,7 @@ function stepX(s) {
 
 const props = defineProps({ group: { type: Object, required: true } })
 
-const { pianoRoll, selectedSample, laneSettings, currentStep, setPianoNote, setSelectedSample } = useSequencer()
+const { pianoRoll, selectedSample, laneSettings, groupReverbSends, currentStep, setPianoNote, setSelectedSample, previewNote } = useSequencer()
 
 const displayNotes = computed(() => [...PIANO_NOTES].reverse())
 const noteIndexMap  = Object.fromEntries(PIANO_NOTES.map((n, i) => [n, i]))
@@ -255,8 +256,8 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   color: v-bind('group.color');
 }
 
-.roll-controls { display: flex; gap: 12px; flex: 1; max-width: 340px; }
-.ctrl-row { display: flex; align-items: center; gap: 6px; flex: 1; }
+.roll-controls { display: flex; gap: 12px; flex-shrink: 0; }
+.ctrl-row { display: flex; align-items: center; gap: 6px; width: 240px; flex-shrink: 0; }
 .ctrl-label {
   font-family: 'Courier New', monospace;
   font-size: 10px;
@@ -288,10 +289,12 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 .octave-sep {
   height: 1px;
   background: #253550;
+  opacity: 0.5;
   align-self: stretch;
+  margin: 2px 0;
 }
 
-/* --- Key strip --- */
+/* --- Key strip (now a button for audition) --- */
 .key-strip {
   width: 110px;
   flex-shrink: 0;
@@ -299,12 +302,23 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   align-items: center;
   padding-left: 6px;
   background: #18283e;
+  border: none;
   border-right: 2px solid #2a4060;
+  cursor: pointer;
+  transition: background 0.06s;
+}
+.key-strip:hover,
+.key-strip:active {
+  background: #223450;
 }
 .key-strip--black {
   background: linear-gradient(to right, #0b1522 0%, #0b1522 65%, #13202f 65%);
   padding-left: 18px;
   border-right-color: #1a2845;
+}
+.key-strip--black:hover,
+.key-strip--black:active {
+  background: linear-gradient(to right, #152235 0%, #152235 65%, #1a2d40 65%);
 }
 .key-strip--c {}
 

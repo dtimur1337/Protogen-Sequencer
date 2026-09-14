@@ -3,6 +3,8 @@
     class="lane-row"
     role="group"
     :aria-label="`${lane.name} lane`"
+    @mouseup="endDrag"
+    @mouseleave="endDrag"
   >
     <div class="lane-name" aria-hidden="true">{{ lane.name }}</div>
 
@@ -16,7 +18,9 @@
           :color="color"
           :lane-name="lane.name"
           :step-num="stepIdx + 1"
-          @toggle="togglePad(lane.id, stepIdx)"
+          @mousedown.prevent="startDrag(lane.id, stepIdx)"
+          @mouseenter="enterDrag(lane.id, stepIdx)"
+          @click="handleClick(lane.id, stepIdx, $event)"
         />
       </div>
     </div>
@@ -34,30 +38,18 @@
         />
         <span class="ctrl-label" aria-hidden="true">VOL</span>
       </div>
-      <div class="control-group">
-        <v-slider
-          v-model="laneSettings[lane.id].reverbSend"
-          min="0" max="100" step="1"
-          hide-details density="compact"
-          color="secondary"
-          class="ctrl-slider"
-          thumb-size="12"
-          :aria-label="`Reverb for ${lane.name}`"
-        />
-        <span class="ctrl-label" aria-hidden="true">REV</span>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onUnmounted } from 'vue'
 import PadButton from './PadButton.vue'
 import { useSequencer } from '../composables/useSequencer'
 
 defineProps({
-  lane:     { type: Object, required: true },
-  color:    { type: String, default: '#ff6b2b' },
+  lane:  { type: Object, required: true },
+  color: { type: String, default: '#ff6b2b' },
 })
 
 const { pads, laneSettings, currentStep, togglePad } = useSequencer()
@@ -67,6 +59,34 @@ const padGroups = computed(() =>
     Array.from({ length: 4 }, (_, i) => g * 4 + i)
   )
 )
+
+// --- Drag-to-paint ---
+const drag = ref({ active: false, mode: 'activate' })
+
+function startDrag(laneId, stepIndex) {
+  const pad = pads[laneId]?.[stepIndex]
+  if (!pad) return
+  const newState = !pad.active
+  pad.active = newState
+  drag.value = { active: true, mode: newState ? 'activate' : 'erase' }
+}
+
+function enterDrag(laneId, stepIndex) {
+  if (!drag.value.active) return
+  const pad = pads[laneId]?.[stepIndex]
+  if (!pad) return
+  pad.active = drag.value.mode === 'activate'
+}
+
+function endDrag() { drag.value.active = false }
+
+// Keyboard-triggered clicks (Enter/Space) have event.detail === 0
+function handleClick(laneId, stepIndex, event) {
+  if (event.detail === 0) togglePad(laneId, stepIndex)
+}
+
+window.addEventListener('mouseup', endDrag)
+onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 </script>
 
 <style scoped>
@@ -115,7 +135,8 @@ const padGroups = computed(() =>
   display: flex;
   align-items: center;
   gap: 4px;
-  width: 120px;
+  width: 240px;
+  flex-shrink: 0;
 }
 
 .ctrl-slider {

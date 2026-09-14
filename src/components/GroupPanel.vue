@@ -1,5 +1,6 @@
 <template>
   <div class="group-panel" :style="{ '--group-color': group.color }">
+    <!-- Header: just chevron + name + divider -->
     <button
       class="group-header"
       :aria-expanded="expanded"
@@ -15,6 +16,34 @@
 
     <v-expand-transition>
       <div v-if="expanded" class="group-content">
+        <!-- Group-level VOL + REV controls for non-pitched groups (Drums, FX) -->
+        <div v-if="!group.hasNotes" class="group-controls">
+          <div class="ctrl-row">
+            <span class="ctrl-label">VOL</span>
+            <v-slider
+              v-model="groupVolumes[group.id]"
+              min="0" max="100" step="1"
+              hide-details density="compact"
+              :color="group.color"
+              class="ctrl-slider"
+              thumb-size="12"
+              :aria-label="`${group.name} volume`"
+            />
+          </div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">REV</span>
+            <v-slider
+              v-model="groupReverbSends[group.id]"
+              min="0" max="100" step="1"
+              hide-details density="compact"
+              color="secondary"
+              class="ctrl-slider"
+              thumb-size="12"
+              :aria-label="`${group.name} reverb`"
+            />
+          </div>
+        </div>
+
         <slot />
       </div>
     </v-expand-transition>
@@ -23,8 +52,11 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useSequencer } from '../composables/useSequencer'
+
 defineProps({ group: { type: Object, required: true } })
 const expanded = ref(true)
+const { groupVolumes, groupReverbSends } = useSequencer()
 </script>
 
 <style scoped>
@@ -79,5 +111,34 @@ const expanded = ref(true)
 
 .group-content {
   padding-bottom: 4px;
+}
+
+/* Group-level controls for non-pitched groups */
+.group-controls {
+  display: flex;
+  gap: 12px;
+  padding: 6px 0 10px;
+}
+
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.ctrl-label {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  color: #8ab4d8;
+  flex-shrink: 0;
+  width: 28px;
+}
+
+.ctrl-slider {
+  flex: 1;
 }
 </style>

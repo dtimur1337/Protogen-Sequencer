@@ -21,8 +21,8 @@
         thumb-size="12"
         aria-label="Tempo in BPM"
       />
-      <span class="bpm-value">{{ bpm }}</span>
     </div>
+    <span class="bpm-value">{{ bpm }}</span>
 
     <div class="vol-control">
       <span class="transport-label">VOL</span>
@@ -108,15 +108,17 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, play, stop } = use
 .bpm-control {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 0 0 200px;
+  gap: 6px;
+  width: 240px;
+  flex-shrink: 0;
 }
 
 .vol-control {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 0 0 130px;
+  gap: 6px;
+  width: 240px;
+  flex-shrink: 0;
 }
 
 .vol-slider {
@@ -125,10 +127,12 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, play, stop } = use
 
 .transport-label {
   font-family: 'Courier New', monospace;
-  font-size: 9px;
-  letter-spacing: 0.2em;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  font-weight: 600;
   color: #8ab4d8;
   flex-shrink: 0;
+  width: 28px;
 }
 
 .bpm-slider {
