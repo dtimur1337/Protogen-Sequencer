@@ -74,10 +74,10 @@
         </button>
 
         <!-- Step area: transparent click grid + note bars -->
-        <div class="step-area">
+        <div class="step-area" :style="{ width: stepAreaWidth + 'px' }">
           <!-- Interaction layer (transparent cells for mouse events) -->
           <div class="click-grid">
-            <div v-for="g in 4" :key="g" class="step-group">
+            <div v-for="g in numGroups" :key="g" class="step-group">
               <button
                 v-for="s in 4"
                 :key="s"
@@ -113,7 +113,6 @@
 import { computed, ref, onUnmounted } from 'vue'
 import { useSequencer, PIANO_NOTES } from '../composables/useSequencer'
 
-const STEPS = 16
 const PAD_W = 36   // px — must match .grid-cell width
 const GAP_IN = 4   // px — gap within a step-group
 const GAP_OUT = 8  // px — gap between step-groups
@@ -126,7 +125,13 @@ function stepX(s) {
 
 const props = defineProps({ group: { type: Object, required: true } })
 
-const { pianoRoll, selectedSample, laneSettings, groupReverbSends, currentStep, setPianoNote, setSelectedSample, previewNote } = useSequencer()
+const { pianoRoll, selectedSample, laneSettings, groupReverbSends, currentStep, steps, setPianoNote, setSelectedSample, previewNote } = useSequencer()
+
+const numGroups = computed(() => steps.value / 4)
+const stepAreaWidth = computed(() => {
+  const n = numGroups.value
+  return n * (4 * PAD_W + 3 * GAP_IN) + (n - 1) * GAP_OUT
+})
 
 const displayNotes = computed(() => [...PIANO_NOTES].reverse())
 const noteIndexMap  = Object.fromEntries(PIANO_NOTES.map((n, i) => [n, i]))
@@ -146,7 +151,7 @@ function keyLabel(note) {
 function rowNotes(ni) {
   const row = pianoRoll[props.group.id][ni]
   const out = []
-  for (let s = 0; s < STEPS; s++) {
+  for (let s = 0; s < steps.value; s++) {
     if (row[s] > 0) out.push({ startStep: s, duration: row[s] })
   }
   return out
@@ -232,6 +237,8 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   border-top: 1px solid #1a2540;
   border-bottom: 1px solid #1a2540;
   margin: 6px 0 14px -14px;
+  width: calc(100% + 14px);
+  box-sizing: border-box;
 }
 
 .sample-tabs {
@@ -339,7 +346,6 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 /* --- Step area --- */
 .step-area {
   position: relative;
-  width: 648px;   /* 4*(4*36+3*4+8) = 648 */
   flex-shrink: 0;
 }
 

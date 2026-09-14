@@ -1,4 +1,4 @@
-export const STEPS = 16
+export const STEPS = 32  // max pre-allocated steps
 export const ROOT_NOTE = 'C3'
 
 export const GROUPS = [

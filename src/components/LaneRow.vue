@@ -63,10 +63,10 @@ defineProps({
   color: { type: String, default: '#ff6b2b' },
 })
 
-const { pads, laneSettings, laneSampleSelections, currentStep, togglePad, setLaneSample } = useSequencer()
+const { pads, laneSettings, laneSampleSelections, currentStep, steps, togglePad, setLaneSample } = useSequencer()
 
 const padGroups = computed(() =>
-  Array.from({ length: 4 }, (_, g) =>
+  Array.from({ length: steps.value / 4 }, (_, g) =>
     Array.from({ length: 4 }, (_, i) => g * 4 + i)
   )
 )

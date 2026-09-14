@@ -123,6 +123,8 @@ const { groupVolumes, groupReverbSends } = useSequencer()
   border-top: 1px solid #1a2540;
   border-bottom: 1px solid #1a2540;
   margin: 6px 0 10px -14px;
+  width: calc(100% + 14px);
+  box-sizing: border-box;
 }
 
 .ctrl-row {

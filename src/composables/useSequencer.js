@@ -26,6 +26,7 @@ const isLoading    = ref(false)
 const currentStep  = ref(-1)
 const bpm          = ref(120)
 const masterVolume = ref(80)
+const steps        = ref(16)
 
 // Per-group volume and reverb send (0-100)
 const groupVolumes     = reactive({})
@@ -138,7 +139,7 @@ async function initAudio() {
     }
 
     Draw.schedule(() => { currentStep.value = step }, time)
-    _step = (step + 1) % STEPS
+    _step = (step + 1) % steps.value
   }, '16n')
 
   isLoading.value = false
@@ -175,6 +176,12 @@ function setPianoNote(groupId, noteIndex, stepIndex, value) {
 
 function setSelectedSample(groupId, sampleId) {
   selectedSample[groupId] = sampleId
+}
+
+function setSteps(n) {
+  steps.value = n
+  if (_step >= n) _step = 0
+  if (currentStep.value >= n) currentStep.value = -1
 }
 
 function resetTrack() {
@@ -282,12 +289,12 @@ initState()
 
 export function useSequencer() {
   return {
-    isPlaying, isLoading, currentStep, bpm, masterVolume,
+    isPlaying, isLoading, currentStep, bpm, masterVolume, steps,
     groupVolumes, groupReverbSends,
     pads, pianoRoll, selectedSample, laneSettings, laneSampleSelections,
     play, stop,
     togglePad, togglePianoNote, setPianoNote, setSelectedSample,
     setLaneSample, previewNote,
-    resetTrack, loadPreset,
+    setSteps, resetTrack, loadPreset,
   }
 }

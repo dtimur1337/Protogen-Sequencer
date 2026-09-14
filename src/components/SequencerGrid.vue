@@ -28,5 +28,7 @@ import { GROUPS } from '../config/samples'
 .sequencer-grid {
   overflow-x: auto;
   padding: 8px 0;
+  display: grid;
+  grid-template-columns: minmax(max-content, 1fr);
 }
 </style>

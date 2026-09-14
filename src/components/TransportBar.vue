@@ -37,12 +37,22 @@
       />
     </div>
 
+    <div class="steps-toggle">
+      <button
+        v-for="n in [16, 32]"
+        :key="n"
+        class="steps-btn"
+        :class="{ active: steps === n }"
+        @click="setSteps(n)"
+      >{{ n }}</button>
+    </div>
+
     <div class="step-indicators">
       <div
-        v-for="i in 16"
+        v-for="i in steps"
         :key="i"
         class="step-dot"
-        :class="{ active: currentStep === i - 1 }"
+        :class="{ active: currentStep === i - 1, small: steps === 32 }"
       />
     </div>
   </div>
@@ -51,7 +61,7 @@
 <script setup>
 import { useSequencer } from '../composables/useSequencer'
 
-const { isPlaying, isLoading, currentStep, bpm, masterVolume, play, stop } = useSequencer()
+const { isPlaying, isLoading, currentStep, bpm, masterVolume, steps, play, stop, setSteps } = useSequencer()
 </script>
 
 <style scoped>
@@ -149,10 +159,42 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, play, stop } = use
   flex-shrink: 0;
 }
 
-.step-indicators {
+.steps-toggle {
   display: flex;
   gap: 4px;
+  flex-shrink: 0;
+}
+
+.steps-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  background: transparent;
+  border: 1px solid #253550;
+  border-radius: 2px;
+  color: #5a7a9a;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+
+.steps-btn:hover {
+  border-color: #3a5878;
+  color: #8ab4d8;
+}
+
+.steps-btn.active {
+  border-color: #ff6b2b;
+  background: #ff6b2b18;
+  color: #ff6b2b;
+}
+
+.step-indicators {
+  display: flex;
+  gap: 3px;
   align-items: center;
+  flex-wrap: nowrap;
 }
 
 .step-dot {
@@ -161,6 +203,12 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, play, stop } = use
   border-radius: 50%;
   background: #1a2540;
   transition: background 0.05s;
+  flex-shrink: 0;
+}
+
+.step-dot.small {
+  width: 4px;
+  height: 4px;
 }
 
 .step-dot:nth-child(4n+1) {
