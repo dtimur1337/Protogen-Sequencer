@@ -31,6 +31,8 @@ const steps        = ref(16)
 // Per-group volume and reverb send (0-100)
 const groupVolumes     = reactive({})
 const groupReverbSends = reactive({})
+const groupMutes       = reactive({})
+const groupSolos       = reactive({})
 
 // Pad state for non-pitched groups
 const pads = reactive({})
@@ -53,6 +55,8 @@ function initState() {
   for (const group of GROUPS) {
     if (!groupVolumes[group.id])     groupVolumes[group.id]     = 80
     if (!groupReverbSends[group.id]) groupReverbSends[group.id] = 0
+    if (groupMutes[group.id] === undefined)  groupMutes[group.id]  = false
+    if (groupSolos[group.id] === undefined)  groupSolos[group.id]  = false
     for (const lane of group.lanes) {
       if (!group.hasNotes && !pads[lane.id]) {
         pads[lane.id] = Array.from({ length: STEPS }, () => ({ active: false }))
@@ -108,7 +112,7 @@ async function initAudio() {
   watch(masterVolume, v => { if (masterGain) masterGain.gain.value = v / 100 })
 
   for (const group of GROUPS) {
-    watch(() => groupVolumes[group.id],     v => { if (groupGains[group.id])         groupGains[group.id].gain.value         = v / 100 })
+    watch(() => groupVolumes[group.id],     () => updateGroupGains())
     watch(() => groupReverbSends[group.id], v => { if (groupReverbSendGains[group.id]) groupReverbSendGains[group.id].gain.value = v / 100 })
     for (const lane of group.lanes) {
       watch(() => laneSettings[lane.id].volume, v => { if (volumeGains[lane.id]) volumeGains[lane.id].gain.value = v / 100 })
@@ -176,6 +180,27 @@ function setPianoNote(groupId, noteIndex, stepIndex, value) {
 
 function setSelectedSample(groupId, sampleId) {
   selectedSample[groupId] = sampleId
+}
+
+function updateGroupGains() {
+  if (!audioInitialized) return
+  const anySolo = GROUPS.some(g => groupSolos[g.id])
+  for (const group of GROUPS) {
+    const muted = groupMutes[group.id] || (anySolo && !groupSolos[group.id])
+    if (groupGains[group.id]) {
+      groupGains[group.id].gain.value = muted ? 0 : groupVolumes[group.id] / 100
+    }
+  }
+}
+
+function toggleMute(groupId) {
+  groupMutes[groupId] = !groupMutes[groupId]
+  updateGroupGains()
+}
+
+function toggleSolo(groupId) {
+  groupSolos[groupId] = !groupSolos[groupId]
+  updateGroupGains()
 }
 
 function setSteps(n) {
@@ -290,11 +315,12 @@ initState()
 export function useSequencer() {
   return {
     isPlaying, isLoading, currentStep, bpm, masterVolume, steps,
-    groupVolumes, groupReverbSends,
+    groupVolumes, groupReverbSends, groupMutes, groupSolos,
     pads, pianoRoll, selectedSample, laneSettings, laneSampleSelections,
     play, stop,
     togglePad, togglePianoNote, setPianoNote, setSelectedSample,
     setLaneSample, previewNote,
     setSteps, resetTrack, loadPreset,
+    toggleMute, toggleSolo,
   }
 }

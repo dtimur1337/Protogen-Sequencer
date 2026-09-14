@@ -72,6 +72,9 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, steps, play, stop,
   padding: 12px 16px;
   background: #0d1420;
   border-bottom: 1px solid #1a2540;
+  position: sticky;
+  top: var(--v-layout-top, 0px);
+  z-index: 10;
 }
 
 .play-btn {
