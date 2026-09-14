@@ -271,6 +271,7 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 .roll-grid {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   width: fit-content;
   user-select: none;
 }
@@ -279,7 +280,7 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   display: flex;
   align-items: stretch;
   gap: 12px;
-  height: 26px;
+  height: 21px;
 }
 .note-row--black { background: #090e18; }
 .note-row--c     { border-top: 1px solid #253550; }
