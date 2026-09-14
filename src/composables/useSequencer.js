@@ -13,6 +13,7 @@ for (let oct = 2; oct <= 4; oct++) {
 // --- Module-level singletons ---
 let audioInitialized = false
 let reverbBus = null
+let masterGain = null
 let _step = 0
 const samplers = {}
 const volumeGains = {}
@@ -23,6 +24,7 @@ const isPlaying = ref(false)
 const isLoading = ref(false)
 const currentStep = ref(-1)
 const bpm = ref(120)
+const masterVolume = ref(80)
 
 // Pad state for non-pitched groups (Drums, FX)
 const pads = reactive({})
@@ -60,8 +62,10 @@ async function initAudio() {
 
   await toneStart()
 
-  reverbBus = new Reverb({ decay: 2.5, wet: 1 }).toDestination()
+  masterGain = new Gain(masterVolume.value / 100).toDestination()
+  reverbBus = new Reverb({ decay: 2.5, wet: 1 })
   await reverbBus.ready
+  reverbBus.connect(masterGain)
 
   for (const group of GROUPS) {
     for (const lane of group.lanes) {
@@ -70,7 +74,7 @@ async function initAudio() {
       const revGain = new Gain(laneSettings[lane.id].reverbSend / 100)
 
       sampler.connect(volGain)
-      volGain.toDestination()
+      volGain.connect(masterGain)
       volGain.connect(revGain)
       revGain.connect(reverbBus)
 
@@ -88,6 +92,7 @@ async function initAudio() {
       watch(() => laneSettings[lane.id].reverbSend, (v) => { if (reverbSendGains[lane.id]) reverbSendGains[lane.id].gain.value = v / 100 })
     }
   }
+  watch(masterVolume, (v) => { if (masterGain) masterGain.gain.value = v / 100 })
 
   Transport.scheduleRepeat((time) => {
     const step = _step
@@ -142,6 +147,10 @@ function togglePianoNote(groupId, noteIndex, stepIndex) {
   pianoRoll[groupId][noteIndex][stepIndex] = !pianoRoll[groupId][noteIndex][stepIndex]
 }
 
+function setPianoNote(groupId, noteIndex, stepIndex, value) {
+  pianoRoll[groupId][noteIndex][stepIndex] = value
+}
+
 function setSelectedSample(groupId, sampleId) {
   selectedSample[groupId] = sampleId
 }
@@ -152,9 +161,9 @@ initState()
 
 export function useSequencer() {
   return {
-    isPlaying, isLoading, currentStep, bpm,
+    isPlaying, isLoading, currentStep, bpm, masterVolume,
     pads, pianoRoll, selectedSample, laneSettings,
     play, stop,
-    togglePad, togglePianoNote, setSelectedSample,
+    togglePad, togglePianoNote, setPianoNote, setSelectedSample,
   }
 }

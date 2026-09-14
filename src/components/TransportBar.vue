@@ -11,7 +11,7 @@
     </button>
 
     <div class="bpm-control">
-      <span class="bpm-label">BPM</span>
+      <span class="transport-label">BPM</span>
       <v-slider
         v-model="bpm"
         min="60" max="180" step="1"
@@ -19,8 +19,22 @@
         color="primary"
         class="bpm-slider"
         thumb-size="12"
+        aria-label="Tempo in BPM"
       />
       <span class="bpm-value">{{ bpm }}</span>
+    </div>
+
+    <div class="vol-control">
+      <span class="transport-label">VOL</span>
+      <v-slider
+        v-model="masterVolume"
+        min="0" max="100" step="1"
+        hide-details density="compact"
+        color="secondary"
+        class="vol-slider"
+        thumb-size="12"
+        aria-label="Master volume"
+      />
     </div>
 
     <div class="step-indicators">
@@ -37,7 +51,7 @@
 <script setup>
 import { useSequencer } from '../composables/useSequencer'
 
-const { isPlaying, isLoading, currentStep, bpm, play, stop } = useSequencer()
+const { isPlaying, isLoading, currentStep, bpm, masterVolume, play, stop } = useSequencer()
 </script>
 
 <style scoped>
@@ -98,11 +112,22 @@ const { isPlaying, isLoading, currentStep, bpm, play, stop } = useSequencer()
   flex: 0 0 200px;
 }
 
-.bpm-label {
+.vol-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 130px;
+}
+
+.vol-slider {
+  flex: 1;
+}
+
+.transport-label {
   font-family: 'Courier New', monospace;
   font-size: 9px;
   letter-spacing: 0.2em;
-  color: #3a5070;
+  color: #8ab4d8;
   flex-shrink: 0;
 }
 

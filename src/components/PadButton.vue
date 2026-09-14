@@ -34,9 +34,9 @@ const ariaLabel = computed(() =>
 .pad {
   width: 36px;
   height: 36px;
-  border: 1px solid #1e2d45;
+  border: 1px solid #253550;
   border-radius: 3px;
-  background: #0d1522;
+  background: #0e1828;
   cursor: pointer;
   transition: background 0.05s, border-color 0.05s, box-shadow 0.05s;
   padding: 0;
@@ -45,22 +45,22 @@ const ariaLabel = computed(() =>
 
 .pad:hover {
   border-color: var(--pad-color);
-  background: #141f2e;
+  background: #1a2a40;
 }
 
 .pad--current {
-  border-color: #ffffff22;
-  background: #131e30;
+  border-color: #ffffff30;
+  background: #152235;
 }
 
 .pad--active {
-  background: color-mix(in srgb, var(--pad-color) 28%, #0d1522);
+  background: color-mix(in srgb, var(--pad-color) 35%, #0d1522);
   border-color: var(--pad-color);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--pad-color) 40%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--pad-color) 50%, transparent);
 }
 
 .pad--active-current {
-  background: color-mix(in srgb, var(--pad-color) 55%, #0d1522);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--pad-color) 70%, transparent);
+  background: color-mix(in srgb, var(--pad-color) 60%, #0d1522);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--pad-color) 75%, transparent);
 }
 </style>

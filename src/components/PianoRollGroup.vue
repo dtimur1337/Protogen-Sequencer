@@ -18,6 +18,7 @@
 
       <div class="roll-controls">
         <div class="ctrl-row">
+          <span class="ctrl-label">VOL</span>
           <v-slider
             v-model="laneSettings[selectedSample[group.id]].volume"
             min="0" max="100" step="1"
@@ -27,9 +28,9 @@
             thumb-size="12"
             :aria-label="`Volume for ${group.name}`"
           />
-          <span class="ctrl-label" aria-hidden="true">VOL</span>
         </div>
         <div class="ctrl-row">
+          <span class="ctrl-label">REV</span>
           <v-slider
             v-model="laneSettings[selectedSample[group.id]].reverbSend"
             min="0" max="100" step="1"
@@ -39,13 +40,18 @@
             thumb-size="12"
             :aria-label="`Reverb for ${group.name}`"
           />
-          <span class="ctrl-label" aria-hidden="true">REV</span>
         </div>
       </div>
     </div>
 
     <!-- Piano roll grid -->
-    <div class="roll-grid" role="grid" :aria-label="`${group.name} piano roll`">
+    <div
+      class="roll-grid"
+      role="grid"
+      :aria-label="`${group.name} piano roll`"
+      @mouseup="endDrag"
+      @mouseleave="endDrag"
+    >
       <div
         v-for="(note, di) in displayNotes"
         :key="note"
@@ -58,7 +64,12 @@
         :aria-label="note"
       >
         <!-- Piano key strip -->
-        <div class="key-strip" aria-hidden="true">
+        <div
+          class="key-strip"
+          :class="{ 'key-strip--black': isBlack(note), 'key-strip--c': isC(note) }"
+          :aria-label="`${note} key`"
+          role="presentation"
+        >
           <span class="key-name">{{ keyLabel(note) }}</span>
         </div>
 
@@ -79,7 +90,8 @@
               :aria-label="`${note} step ${si(g, s) + 1}, ${pianoRoll[group.id][noteIdx(note)][si(g, s)] ? 'on' : 'off'}`"
               :aria-pressed="pianoRoll[group.id][noteIdx(note)][si(g, s)]"
               role="gridcell"
-              @click="togglePianoNote(group.id, noteIdx(note), si(g, s))"
+              @mousedown.prevent="startDrag(noteIdx(note), si(g, s))"
+              @mouseenter="enterPad(noteIdx(note), si(g, s))"
             />
           </div>
         </div>
@@ -89,16 +101,16 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onUnmounted } from 'vue'
 import { useSequencer, PIANO_NOTES } from '../composables/useSequencer'
 
 const props = defineProps({
   group: { type: Object, required: true },
 })
 
-const { pianoRoll, selectedSample, laneSettings, currentStep, togglePianoNote, setSelectedSample } = useSequencer()
+const { pianoRoll, selectedSample, laneSettings, currentStep, setPianoNote, setSelectedSample } = useSequencer()
 
-const displayNotes = computed(() => [...PIANO_NOTES].reverse()) // top = B4, bottom = C2
+const displayNotes = computed(() => [...PIANO_NOTES].reverse())
 const noteIndexMap  = Object.fromEntries(PIANO_NOTES.map((n, i) => [n, i]))
 
 function noteIdx(note) { return noteIndexMap[note] }
@@ -108,10 +120,31 @@ const BLACK_NAMES = new Set(['C#', 'D#', 'F#', 'G#', 'A#'])
 function isBlack(note) { return BLACK_NAMES.has(note.match(/^([A-G]#?)/)?.[1] ?? '') }
 function isC(note)     { return /^C\d$/.test(note) }
 function keyLabel(note) {
-  if (isC(note))    return note        // C2, C3, C4
-  if (isBlack(note)) return note.replace(/\d$/, '') // C#, D# etc.
+  if (isC(note))     return note
+  if (isBlack(note)) return note.replace(/\d$/, '')
   return ''
 }
+
+// --- Drag-to-paint ---
+const drag = ref({ active: false, noteIndex: null, targetValue: false })
+
+function startDrag(ni, stepIdx) {
+  const newVal = !pianoRoll[props.group.id][ni][stepIdx]
+  setPianoNote(props.group.id, ni, stepIdx, newVal)
+  drag.value = { active: true, noteIndex: ni, targetValue: newVal }
+}
+
+function enterPad(ni, stepIdx) {
+  if (!drag.value.active || drag.value.noteIndex !== ni) return
+  setPianoNote(props.group.id, ni, stepIdx, drag.value.targetValue)
+}
+
+function endDrag() {
+  drag.value.active = false
+}
+
+window.addEventListener('mouseup', endDrag)
+onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 </script>
 
 <style scoped>
@@ -138,18 +171,18 @@ function keyLabel(note) {
   font-size: 10px;
   letter-spacing: 0.1em;
   padding: 4px 10px;
-  border: 1px solid #1e2d45;
+  border: 1px solid #253550;
   border-radius: 2px;
   background: #0d1522;
-  color: #3a5070;
+  color: #5a7a9a;
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
   text-transform: uppercase;
 }
 
 .sample-tab:hover {
-  border-color: #2a4060;
-  color: #5a7090;
+  border-color: #3a5878;
+  color: #7a9ab8;
 }
 
 .sample-tab.active {
@@ -160,40 +193,42 @@ function keyLabel(note) {
 
 .roll-controls {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex: 1;
-  max-width: 320px;
+  max-width: 340px;
 }
 
 .ctrl-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   flex: 1;
 }
 
-.ctrl-slider { flex: 1; }
-
 .ctrl-label {
   font-family: 'Courier New', monospace;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.12em;
-  color: #3a5070;
+  font-weight: 600;
+  color: #8ab4d8;
   flex-shrink: 0;
-  width: 24px;
+  width: 28px;
 }
+
+.ctrl-slider { flex: 1; }
 
 /* --- Roll grid --- */
 .roll-grid {
   display: flex;
   flex-direction: column;
   width: fit-content;
+  user-select: none;
 }
 
 .note-row {
   display: flex;
   align-items: stretch;
-  height: 18px;
+  height: 21px;
 }
 
 .note-row--black {
@@ -201,95 +236,102 @@ function keyLabel(note) {
 }
 
 .note-row--c {
-  border-top: 1px solid #1e2d45;
+  border-top: 1px solid #253550;
 }
 
 /* --- Key strip --- */
 .key-strip {
-  width: 44px;
+  width: 53px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  padding-left: 4px;
-  background: inherit;
-  border-right: 1px solid #1a2540;
+  padding-left: 5px;
+  background: #18273e;
+  border-right: 2px solid #253550;
 }
 
-.note-row:not(.note-row--black) .key-strip {
-  background: #111d2e;
+.key-strip--black {
+  background: #0c1624;
+  padding-left: 14px;
+  border-right-color: #1a2540;
 }
 
-.note-row--black .key-strip {
-  background: #080d18;
-  padding-left: 12px;
+.key-strip--c {
+  border-top: 1px solid #3a5878;
 }
 
 .key-name {
   font-family: 'Courier New', monospace;
-  font-size: 8px;
-  color: #3a5070;
+  font-size: 9px;
+  color: #6a90b4;
   pointer-events: none;
   white-space: nowrap;
 }
 
 .note-row--c .key-name {
-  color: #5a7090;
+  color: #9ac0e0;
   font-weight: 700;
+  font-size: 9px;
+}
+
+.key-strip--black .key-name {
+  color: #4a6880;
+  font-size: 8px;
 }
 
 /* --- Step row --- */
 .step-row {
   display: flex;
-  gap: 6px;
-  padding: 1px 0 1px 6px;
+  gap: 8px;
+  padding: 2px 0 2px 8px;
   align-items: center;
 }
 
 .step-group {
   display: flex;
-  gap: 2px;
+  gap: 4px;
 }
 
 /* --- Roll pad --- */
 .roll-pad {
-  width: 28px;
-  height: 15px;
-  border: 1px solid #141e2e;
+  width: 36px;
+  height: 17px;
+  border: 1px solid #1e2d45;
   border-radius: 2px;
-  background: #0d1522;
+  background: #0e1624;
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
-  transition: background 0.05s, border-color 0.05s, box-shadow 0.05s;
+  transition: background 0.04s, border-color 0.04s, box-shadow 0.04s;
 }
 
 .roll-pad--black {
   background: #090e18;
-  border-color: #0f1825;
+  border-color: #141e30;
 }
 
 .roll-pad:hover {
   border-color: var(--group-color);
-  background: #141f2e;
+  background: #18253a;
 }
 
 .roll-pad--current {
-  border-color: #ffffff18;
-  background: #111e30;
+  border-color: #ffffff28;
+  background: #12203a;
 }
 
 .roll-pad--black.roll-pad--current {
-  background: #0c1522;
+  background: #0c1828;
 }
 
 .roll-pad--active {
-  background: color-mix(in srgb, var(--group-color) 35%, #0d1522);
+  background: color-mix(in srgb, var(--group-color) 40%, #0d1522);
   border-color: var(--group-color);
-  box-shadow: 0 0 4px color-mix(in srgb, var(--group-color) 40%, transparent);
+  box-shadow: 0 0 5px color-mix(in srgb, var(--group-color) 50%, transparent);
 }
 
 .roll-pad--active-current {
-  background: color-mix(in srgb, var(--group-color) 60%, #0d1522);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--group-color) 70%, transparent);
+  background: color-mix(in srgb, var(--group-color) 65%, #0d1522);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--group-color) 75%, transparent);
 }
 </style>

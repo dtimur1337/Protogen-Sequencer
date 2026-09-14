@@ -85,7 +85,7 @@ const padGroups = computed(() =>
   font-weight: 600;
   letter-spacing: 0.08em;
   text-align: right;
-  color: #5a7090;
+  color: #7a9ab8;
   padding-right: 8px;
   text-transform: uppercase;
   white-space: nowrap;
@@ -124,10 +124,11 @@ const padGroups = computed(() =>
 
 .ctrl-label {
   font-family: 'Courier New', monospace;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.12em;
-  color: #3a5070;
+  font-weight: 600;
+  color: #8ab4d8;
   flex-shrink: 0;
-  width: 24px;
+  width: 28px;
 }
 </style>
