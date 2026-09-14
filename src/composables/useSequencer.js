@@ -38,7 +38,7 @@ const pianoRoll = reactive({
 })
 
 // Which sample is active per pitched group
-const selectedSample = reactive({ bass: 'bas1', melodics: 'syn1' })
+const selectedSample = reactive({ bass: 'bas2', melodics: 'syn1' })
 
 // Per-lane audio settings (used by all lanes, but pitched groups show selected lane's settings)
 const laneSettings = reactive({})

@@ -20,8 +20,8 @@ export const GROUPS = [
     hasNotes: true,
     color: '#1e90ff',
     lanes: [
-      { id: 'bas1', name: 'BAS 1', sample: new URL('../assets/samples/Bass/BAS 1.wav', import.meta.url).href },
       { id: 'bas2', name: 'BAS 2', sample: new URL('../assets/samples/Bass/BAS 2.wav', import.meta.url).href },
+      { id: 'bas1', name: 'BAS 1', sample: new URL('../assets/samples/Bass/BAS 1.wav', import.meta.url).href },
       { id: 'bas3', name: 'BAS 3', sample: new URL('../assets/samples/Bass/BAS 3.wav', import.meta.url).href },
       { id: 'bas4', name: 'BAS 4', sample: new URL('../assets/samples/Bass/BAS 4.wav', import.meta.url).href },
     ],

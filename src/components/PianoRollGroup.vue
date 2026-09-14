@@ -279,7 +279,7 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   display: flex;
   align-items: stretch;
   gap: 12px;
-  height: 21px;
+  height: 26px;
 }
 .note-row--black { background: #090e18; }
 .note-row--c     { border-top: 1px solid #253550; }
