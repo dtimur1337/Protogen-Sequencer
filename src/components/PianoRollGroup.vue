@@ -220,14 +220,18 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 </script>
 
 <style scoped>
-.piano-roll-group { padding: 6px 0; }
+.piano-roll-group { padding: 0 0 6px; }
 
-/* --- Toolbar --- */
+/* --- Toolbar — styled as transport bar --- */
 .roll-toolbar {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 8px;
+  gap: 24px;
+  padding: 8px 16px;
+  background: #0d1420;
+  border-top: 1px solid #1a2540;
+  border-bottom: 1px solid #1a2540;
+  margin: 6px 0 14px -14px;
 }
 
 .sample-tabs {

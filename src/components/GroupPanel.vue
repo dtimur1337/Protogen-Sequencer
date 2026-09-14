@@ -113,11 +113,16 @@ const { groupVolumes, groupReverbSends } = useSequencer()
   padding-bottom: 4px;
 }
 
-/* Group-level controls for non-pitched groups */
+/* Group-level controls for non-pitched groups — styled as transport bar */
 .group-controls {
   display: flex;
-  gap: 12px;
-  padding: 6px 0 10px;
+  align-items: center;
+  gap: 24px;
+  padding: 8px 16px;
+  background: #0d1420;
+  border-top: 1px solid #1a2540;
+  border-bottom: 1px solid #1a2540;
+  margin: 6px 0 10px -14px;
 }
 
 .ctrl-row {
