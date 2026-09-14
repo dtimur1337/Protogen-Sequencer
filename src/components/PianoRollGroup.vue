@@ -283,7 +283,7 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   height: 21px;
 }
 .note-row--black { background: #090e18; }
-.note-row--c     { border-top: 1px solid #253550; }
+.note-row--c     {}
 
 /* --- Key strip --- */
 .key-strip {
@@ -300,7 +300,7 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   padding-left: 18px;
   border-right-color: #1a2845;
 }
-.key-strip--c { border-top: 1px solid #4a70a0; }
+.key-strip--c {}
 
 .key-name {
   font-family: 'Courier New', monospace;
