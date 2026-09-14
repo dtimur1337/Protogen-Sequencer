@@ -78,7 +78,7 @@ const padGroups = computed(() =>
 }
 
 .lane-name {
-  width: 76px;
+  width: 110px;
   flex-shrink: 0;
   font-family: 'Courier New', monospace;
   font-size: 11px;
@@ -86,7 +86,7 @@ const padGroups = computed(() =>
   letter-spacing: 0.08em;
   text-align: right;
   color: #7a9ab8;
-  padding-right: 8px;
+  padding-right: 12px;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;

@@ -120,9 +120,8 @@ const BLACK_NAMES = new Set(['C#', 'D#', 'F#', 'G#', 'A#'])
 function isBlack(note) { return BLACK_NAMES.has(note.match(/^([A-G]#?)/)?.[1] ?? '') }
 function isC(note)     { return /^C\d$/.test(note) }
 function keyLabel(note) {
-  if (isC(note))     return note
-  if (isBlack(note)) return note.replace(/\d$/, '')
-  return ''
+  if (isC(note)) return note                  // "C3" — full name with octave
+  return note.replace(/\d$/, '')              // "D", "F#", "A", etc. — no octave
 }
 
 // --- Drag-to-paint ---
@@ -241,41 +240,42 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 
 /* --- Key strip --- */
 .key-strip {
-  width: 53px;
+  width: 110px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  padding-left: 5px;
-  background: #18273e;
-  border-right: 2px solid #253550;
+  padding-left: 6px;
+  background: #18283e;
+  border-right: 2px solid #2a4060;
+  position: relative;
 }
 
+/* Black keys look shorter: only fill 65% of the strip width */
 .key-strip--black {
-  background: #0c1624;
-  padding-left: 14px;
-  border-right-color: #1a2540;
+  background: linear-gradient(to right, #0b1522 0%, #0b1522 65%, #13202f 65%);
+  padding-left: 18px;
+  border-right-color: #1a2845;
 }
 
 .key-strip--c {
-  border-top: 1px solid #3a5878;
+  border-top: 1px solid #4a70a0;
 }
 
 .key-name {
   font-family: 'Courier New', monospace;
   font-size: 9px;
-  color: #6a90b4;
+  color: #7ab0d4;
   pointer-events: none;
   white-space: nowrap;
 }
 
 .note-row--c .key-name {
-  color: #9ac0e0;
+  color: #a8d4f0;
   font-weight: 700;
-  font-size: 9px;
 }
 
 .key-strip--black .key-name {
-  color: #4a6880;
+  color: #4a6a88;
   font-size: 8px;
 }
 
@@ -283,7 +283,7 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 .step-row {
   display: flex;
   gap: 8px;
-  padding: 2px 0 2px 8px;
+  padding: 2px 0 2px 12px;
   align-items: center;
 }
 
