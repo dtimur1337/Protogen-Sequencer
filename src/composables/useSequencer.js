@@ -31,9 +31,10 @@ const pads = reactive({})
 
 // Piano roll state for pitched groups (Bass, Melodics)
 // pianoRoll[groupId][noteIndex][stepIndex] = boolean
+// pianoRoll[groupId][noteIndex][stepIndex] = 0 (off) | N (note starts here, lasts N steps)
 const pianoRoll = reactive({
-  bass:     Array.from({ length: 36 }, () => Array.from({ length: STEPS }, () => false)),
-  melodics: Array.from({ length: 36 }, () => Array.from({ length: STEPS }, () => false)),
+  bass:     Array.from({ length: 36 }, () => Array.from({ length: STEPS }, () => 0)),
+  melodics: Array.from({ length: 36 }, () => Array.from({ length: STEPS }, () => 0)),
 })
 
 // Which sample is active per pitched group
@@ -100,9 +101,11 @@ async function initAudio() {
     for (const group of GROUPS) {
       if (group.hasNotes) {
         const laneId = selectedSample[group.id]
+        const stepSecs = Transport.toSeconds('16n')
         for (let ni = 0; ni < PIANO_NOTES.length; ni++) {
-          if (pianoRoll[group.id][ni][step]) {
-            try { samplers[laneId].triggerAttack(PIANO_NOTES[ni], time) } catch (_) {}
+          const dur = pianoRoll[group.id][ni][step]
+          if (dur > 0) {
+            try { samplers[laneId].triggerAttackRelease(PIANO_NOTES[ni], dur * stepSecs, time) } catch (_) {}
           }
         }
       } else {
