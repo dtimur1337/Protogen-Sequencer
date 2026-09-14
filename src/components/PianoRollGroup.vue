@@ -52,9 +52,9 @@
       @mouseup="endDrag"
       @mouseleave="endDrag"
     >
+      <template v-for="note in displayNotes" :key="note">
+      <div v-if="isC(note)" class="octave-sep" aria-hidden="true" />
       <div
-        v-for="note in displayNotes"
-        :key="note"
         class="note-row"
         :class="{
           'note-row--black': isBlack(note),
@@ -103,6 +103,7 @@
           </div>
         </div>
       </div>
+      </template>
     </div>
   </div>
 </template>
@@ -283,7 +284,12 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   height: 21px;
 }
 .note-row--black { background: #090e18; }
-.note-row--c     { border-top: 1px solid #253550; margin-top: 4px; }
+.note-row--c     {}
+.octave-sep {
+  height: 1px;
+  background: #253550;
+  align-self: stretch;
+}
 
 /* --- Key strip --- */
 .key-strip {
@@ -300,7 +306,7 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   padding-left: 18px;
   border-right-color: #1a2845;
 }
-.key-strip--c { border-top: 1px solid #4a70a0; }
+.key-strip--c {}
 
 .key-name {
   font-family: 'Courier New', monospace;
