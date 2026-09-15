@@ -64,7 +64,6 @@ const padGroups = computed(() =>
   )
 )
 
-// --- Drag-to-paint ---
 const drag = ref({ active: false, mode: 'activate' })
 
 function startDrag(laneId, stepIndex) {
@@ -84,7 +83,6 @@ function enterDrag(laneId, stepIndex) {
 
 function endDrag() { drag.value.active = false }
 
-// Keyboard-triggered clicks (Enter/Space) have event.detail === 0
 function handleClick(laneId, stepIndex, event) {
   if (event.detail === 0) togglePad(laneId, stepIndex)
 }
@@ -125,7 +123,7 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   font-weight: 600;
   letter-spacing: 0.08em;
   text-align: right;
-  color: #7a9ab8;
+  color: var(--c-text-2);
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -134,10 +132,10 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 
 .lane-select {
   width: 100%;
-  background: #0d1522;
-  border: 1px solid #253550;
+  background: var(--c-surf-lo);
+  border: 1px solid var(--c-border-2);
   border-radius: 2px;
-  color: #7a9ab8;
+  color: var(--c-text-2);
   font-family: 'Courier New', monospace;
   font-size: 10px;
   font-weight: 600;
@@ -155,17 +153,17 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 }
 
 .lane-select:hover {
-  border-color: #3a5878;
-  color: #9ab8d8;
+  border-color: var(--c-border-3);
+  color: var(--c-text-1);
 }
 
 .lane-select:focus {
-  border-color: #ff6b2b;
+  border-color: var(--c-accent);
 }
 
 .lane-select option {
-  background: #0d1522;
-  color: #7a9ab8;
+  background: var(--c-surf-lo);
+  color: var(--c-text-2);
 }
 
 .pads-area {
@@ -177,5 +175,4 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   display: flex;
   gap: 4px;
 }
-
 </style>

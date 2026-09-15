@@ -57,8 +57,8 @@ const { open: openMixer } = useVolumeModal()
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: #0d1420;
-  border-bottom: 1px solid #1a2540;
+  background: var(--c-surf);
+  border-bottom: 1px solid var(--c-border);
   position: sticky;
   top: var(--v-layout-top, 0px);
   z-index: 10;
@@ -70,10 +70,10 @@ const { open: openMixer } = useVolumeModal()
   gap: 6px;
   height: 48px;
   padding: 0 16px;
-  background: transparent;
-  border: 1px solid #ff6b2b;
+  background: var(--c-accent);
+  border: 1px solid var(--c-accent);
   border-radius: 3px;
-  color: #ff6b2b;
+  color: #fff;
   font-family: 'Courier New', monospace;
   font-size: 11px;
   letter-spacing: 0.15em;
@@ -83,18 +83,19 @@ const { open: openMixer } = useVolumeModal()
 }
 
 .play-btn:hover:not(:disabled) {
-  background: #ff6b2b18;
-  box-shadow: 0 0 10px #ff6b2b44;
+  background: var(--c-accent-dim);
+  box-shadow: 0 0 10px var(--c-accent-glow);
 }
 
 .play-btn.playing {
-  border-color: #ff4444;
-  color: #ff4444;
+  background: var(--c-stop);
+  border-color: var(--c-stop);
+  color: #fff;
 }
 
 .play-btn.playing:hover {
-  background: #ff444418;
-  box-shadow: 0 0 10px #ff444444;
+  background: color-mix(in srgb, var(--c-stop) 85%, black);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--c-stop) 30%, transparent);
 }
 
 .play-btn:disabled {
@@ -117,17 +118,17 @@ const { open: openMixer } = useVolumeModal()
   padding: 0 14px;
   height: 48px;
   background: transparent;
-  border: 1px solid #253550;
+  border: 1px solid var(--c-border-2);
   border-radius: 3px;
-  color: #7a9ab8;
+  color: var(--c-text-2);
   cursor: pointer;
   flex-shrink: 0;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
 }
 .mixer-btn:hover {
-  border-color: #3a5878;
-  color: #a8c8e0;
-  background: #0d1a2a;
+  border-color: var(--c-border-3);
+  color: var(--c-text-1);
+  background: var(--c-pad);
 }
 
 .transport-frame {
@@ -136,7 +137,7 @@ const { open: openMixer } = useVolumeModal()
   gap: 8px;
   height: 48px;
   padding: 8px;
-  border: 1px solid #25355080;
+  border: 1px solid var(--c-border-2);
   border-radius: 3px;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -147,7 +148,7 @@ const { open: openMixer } = useVolumeModal()
   font-size: 10px;
   letter-spacing: 0.12em;
   font-weight: 600;
-  color: #8ab4d8;
+  color: var(--c-text-2);
   flex-shrink: 0;
 }
 
@@ -155,9 +156,9 @@ const { open: openMixer } = useVolumeModal()
   font-family: 'Courier New', monospace;
   font-size: 13px;
   font-weight: 700;
-  color: #ff6b2b;
-  background: #080c16;
-  border: 1px solid #253550;
+  color: var(--c-accent);
+  background: var(--c-surf-lo);
+  border: 1px solid var(--c-border-2);
   border-radius: 2px;
   width: 56px;
   padding: 3px 6px;
@@ -167,7 +168,7 @@ const { open: openMixer } = useVolumeModal()
 }
 .bpm-input::-webkit-outer-spin-button,
 .bpm-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.bpm-input:focus { border-color: #ff6b2b; }
+.bpm-input:focus { border-color: var(--c-accent); }
 
 .steps-toggle {
   display: flex;
@@ -184,22 +185,21 @@ const { open: openMixer } = useVolumeModal()
   letter-spacing: 0.08em;
   padding: 0 8px;
   background: transparent;
-  border: 1px solid #253550;
+  border: 1px solid var(--c-border-2);
   border-radius: 2px;
-  color: #7a9ab8;
+  color: var(--c-text-2);
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
 }
 
 .steps-btn:hover {
-  border-color: #3a5878;
-  color: #8ab4d8;
+  border-color: var(--c-border-3);
+  color: var(--c-text-1);
 }
 
 .steps-btn.active {
-  border-color: #ff6b2b;
-  background: #ff6b2b18;
-  color: #ff6b2b;
+  border-color: var(--c-accent);
+  background: var(--c-accent-bg);
+  color: var(--c-accent);
 }
-
 </style>

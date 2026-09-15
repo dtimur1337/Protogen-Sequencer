@@ -124,7 +124,7 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: #00000088;
+  background: var(--c-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -132,8 +132,8 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
 }
 
 .modal-card {
-  background: #0d1420;
-  border: 1px solid #1a2540;
+  background: var(--c-surf);
+  border: 1px solid var(--c-border);
   border-radius: 4px;
   min-width: 480px;
   max-width: 90vw;
@@ -144,7 +144,7 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px 10px;
-  border-bottom: 1px solid #1a2540;
+  border-bottom: 1px solid var(--c-border);
 }
 
 .modal-title {
@@ -152,19 +152,19 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2em;
-  color: #ff6b2b;
+  color: var(--c-text-2);
 }
 
 .modal-close {
   background: transparent;
   border: none;
-  color: #5a7a9a;
+  color: var(--c-text-3);
   font-size: 14px;
   cursor: pointer;
   padding: 2px 6px;
   line-height: 1;
 }
-.modal-close:hover { color: #a8c8e0; }
+.modal-close:hover { color: var(--c-text-1); }
 
 .modal-body {
   display: flex;
@@ -175,7 +175,7 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
 
 .section-sep {
   width: 1px;
-  background: #1a2540;
+  background: var(--c-border);
   align-self: stretch;
   margin: 0 20px;
 }
@@ -191,7 +191,7 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.2em;
-  color: #5a7a9a;
+  color: var(--c-text-3);
   text-align: center;
 }
 
@@ -222,7 +222,7 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
 .fader-val {
   font-family: 'Courier New', monospace;
   font-size: 9px;
-  color: #7a9ab8;
+  color: var(--c-text-2);
   min-width: 24px;
   text-align: center;
 }
@@ -232,7 +232,7 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #7a9ab8;
+  color: var(--c-text-2);
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -240,7 +240,7 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
 .fader-divider {
   width: 1px;
   height: 100px;
-  background: #1a2540;
+  background: var(--c-border);
   margin: 0 4px;
   align-self: center;
 }

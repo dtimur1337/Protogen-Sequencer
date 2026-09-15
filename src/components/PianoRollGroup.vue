@@ -79,11 +79,11 @@
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useSequencer, PIANO_NOTES } from '../composables/useSequencer'
 import { useSyncScroll } from '../composables/useSyncScroll'
+import { useTheme } from '../composables/useTheme'
 
-const PAD_W = 36   // px — must match .grid-cell width
-const GAP_IN = 4   // px — gap within a step-group
-const GAP_OUT = 8  // px — gap between step-groups
-// x-offset of step S from left edge of step-area
+const PAD_W = 36
+const GAP_IN = 4
+const GAP_OUT = 8
 function stepX(s) {
   const grp = Math.floor(s / 4)
   const pos = s % 4
@@ -94,6 +94,7 @@ const props = defineProps({ group: { type: Object, required: true } })
 
 const { pianoRoll, selectedSample, currentStep, steps, setPianoNote, setSelectedSample, previewNote } = useSequencer()
 const { register, unregister, onScroll } = useSyncScroll()
+const { isDark } = useTheme()
 const stepsScrollRef = ref(null)
 onMounted(() => register(stepsScrollRef.value))
 onUnmounted(() => { unregister(stepsScrollRef.value); window.removeEventListener('mouseup', endDrag) })
@@ -118,7 +119,6 @@ function keyLabel(note) {
   return note.replace(/\d$/, '')
 }
 
-// --- Data helpers ---
 function rowNotes(ni) {
   const row = pianoRoll[props.group.id][ni]
   const out = []
@@ -153,14 +153,12 @@ function eraseAtOrCovering(ni, stepIdx) {
   }
 }
 
-// --- Note bar rendering ---
 function noteBarStyle(bar) {
   const x0 = stepX(bar.startStep)
   const x1 = stepX(bar.startStep + bar.duration - 1) + PAD_W
   return { left: x0 + 'px', width: (x1 - x0) + 'px' }
 }
 
-// --- Drag-to-paint ---
 const drag = ref({ active: false, noteIndex: null, startStep: null, mode: 'create' })
 
 function startDrag(ni, stepIdx) {
@@ -178,7 +176,6 @@ function enterPad(ni, stepIdx) {
   if (!drag.value.active || drag.value.noteIndex !== ni) return
   if (drag.value.mode === 'create') {
     if (stepIdx <= drag.value.startStep) return
-    // Don't extend into an existing note
     const row = pianoRoll[props.group.id][ni]
     for (let s = drag.value.startStep + 1; s <= stepIdx; s++) {
       if (row[s] > 0) return
@@ -197,15 +194,14 @@ window.addEventListener('mouseup', endDrag)
 <style scoped>
 .piano-roll-group { padding: 0 0 6px; }
 
-/* --- Toolbar — styled as transport bar --- */
 .roll-toolbar {
   display: flex;
   align-items: center;
   gap: 24px;
   padding: 8px 16px;
-  background: #0d1420;
-  border-top: 1px solid #1a2540;
-  border-bottom: 1px solid #1a2540;
+  background: var(--c-surf);
+  border-top: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border);
   margin: 6px 0 14px -14px;
   width: calc(100% + 14px);
   box-sizing: border-box;
@@ -222,22 +218,21 @@ window.addEventListener('mouseup', endDrag)
   font-size: 10px;
   letter-spacing: 0.1em;
   padding: 4px 10px;
-  border: 1px solid #253550;
+  border: 1px solid var(--c-border-2);
   border-radius: 2px;
-  background: #0d1522;
-  color: #7a9ab8;
+  background: var(--c-surf-lo);
+  color: var(--c-text-2);
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
   text-transform: uppercase;
 }
-.sample-tab:hover { border-color: #3a5878; color: #a8c8e0; }
+.sample-tab:hover { border-color: var(--c-border-3); color: var(--c-text-1); }
 .sample-tab.active {
   border-color: v-bind('group.color');
-  background: color-mix(in srgb, v-bind('group.color') 15%, #0d1522);
-  color: v-bind('group.color');
+  background: color-mix(in srgb, v-bind('group.color') 15%, var(--c-surf-lo));
+  color: v-bind("isDark ? group.color : '#182030'");
 }
 
-/* --- Two-column roll layout --- */
 .roll-body {
   display: flex;
   gap: 12px;
@@ -269,16 +264,14 @@ window.addEventListener('mouseup', endDrag)
 .step-row {
   height: 24px;
 }
-.step-row--black { background: #090e18; }
 
 .octave-sep {
   height: 1px;
-  background: #253550;
+  background: var(--c-border-2);
   opacity: 0.5;
   margin: 2px 0;
 }
 
-/* --- Key strip (now a button for audition) --- */
 .key-strip {
   width: 110px;
   height: 24px;
@@ -286,45 +279,41 @@ window.addEventListener('mouseup', endDrag)
   display: flex;
   align-items: center;
   padding-left: 6px;
-  background: #18283e;
+  background: var(--c-key-w);
   border: none;
-  border-right: 2px solid #2a4060;
   cursor: pointer;
   transition: background 0.06s;
 }
 .key-strip:hover,
 .key-strip:active {
-  background: #223450;
+  background: var(--c-key-w-h);
 }
 .key-strip--black {
-  background: linear-gradient(to right, #0b1522 0%, #0b1522 65%, #13202f 65%);
+  background: linear-gradient(to right, var(--c-key-b) 0%, var(--c-key-b) 65%, var(--c-key-b-2) 65%);
   padding-left: 18px;
-  border-right-color: #1a2845;
 }
 .key-strip--black:hover,
 .key-strip--black:active {
-  background: linear-gradient(to right, #152235 0%, #152235 65%, #1a2d40 65%);
+  background: linear-gradient(to right, var(--c-key-b-h) 0%, var(--c-key-b-h) 65%, var(--c-key-w) 65%);
 }
 .key-strip--c {}
 
 .key-name {
   font-family: 'Courier New', monospace;
   font-size: 10px;
-  color: #7ab0d4;
+  color: var(--c-key-text);
   pointer-events: none;
   white-space: nowrap;
 }
-.key-strip--c .key-name      { color: #a8d4f0; font-weight: 700; }
-.key-strip--black .key-name  { color: #5a8aaa; font-size: 10px; }
+.key-strip--c .key-name      { color: var(--c-key-c-text); font-weight: 700; }
+.key-strip--black .key-name  { color: var(--c-key-b-text); font-size: 10px; }
 
-/* --- Step area --- */
 .step-area {
   position: relative;
   flex-shrink: 0;
   height: 100%;
 }
 
-/* --- Click grid (transparent interaction layer) --- */
 .click-grid {
   display: flex;
   gap: 8px;
@@ -335,18 +324,17 @@ window.addEventListener('mouseup', endDrag)
 .grid-cell {
   width: 36px;
   height: 100%;
-  background: #0e1624;
-  border: 1px solid #1e2d45;
+  background: var(--c-pad);
+  border: 1px solid var(--c-border-4);
   border-radius: 2px;
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
   transition: background 0.04s, border-color 0.04s;
 }
-.grid-cell:hover       { border-color: #2a4060; background: #14203a; }
-.grid-cell--current    { border-color: #ffffff28; background: #12203a; }
+.grid-cell:hover       { border-color: var(--c-border-5); background: var(--c-pad-hover); }
+.grid-cell--current    { border-color: color-mix(in srgb, var(--c-text-1) 16%, transparent); background: var(--c-pad-cur); }
 
-/* --- Note visual layer --- */
 .note-layer {
   position: absolute;
   inset: 0;
@@ -358,12 +346,12 @@ window.addEventListener('mouseup', endDrag)
   top: 2px;
   bottom: 2px;
   border-radius: 3px;
-  background: color-mix(in srgb, var(--group-color) 42%, #0d1522);
+  background: color-mix(in srgb, var(--group-color) 42%, var(--c-surf-lo));
   border: 1px solid var(--group-color);
   box-shadow: 0 0 5px color-mix(in srgb, var(--group-color) 50%, transparent);
 }
 .note-bar--current {
-  background: color-mix(in srgb, var(--group-color) 68%, #0d1522);
+  background: color-mix(in srgb, var(--group-color) 68%, var(--c-surf-lo));
   box-shadow: 0 0 10px color-mix(in srgb, var(--group-color) 78%, transparent);
 }
 </style>

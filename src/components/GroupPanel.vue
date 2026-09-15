@@ -1,6 +1,5 @@
 <template>
   <div class="group-panel" :style="{ '--group-color': group.color }">
-    <!-- Header: just chevron + name + divider -->
     <div class="group-header">
       <button
         class="group-toggle"
@@ -104,32 +103,32 @@ const { open: openGroupModal } = useGroupModal()
 
 .ms-btn--vol {
   background: transparent;
-  border: 1px solid #3a4560;
-  color: #7a9ab8;
+  border: 1px solid var(--c-border-2);
+  color: var(--c-text-2);
   width: auto;
   padding: 0 6px;
   letter-spacing: 0.05em;
 }
-.ms-btn--vol:hover { border-color: #ff6b2b; color: #ff6b2b; }
+.ms-btn--vol:hover { border-color: var(--c-accent); color: var(--c-accent); }
 
 .ms-btn--mute {
   background: transparent;
-  border: 1px solid #3a4560;
-  color: #7a9ab8;
+  border: 1px solid var(--c-border-2);
+  color: var(--c-text-2);
 }
 .ms-btn--mute:hover  { border-color: #ff8844; color: #ff8844; }
 .ms-btn--mute.active { background: #ff884422; border-color: #ff8844; color: #ff8844; }
 
 .ms-btn--solo {
   background: transparent;
-  border: 1px solid #3a4560;
-  color: #7a9ab8;
+  border: 1px solid var(--c-border-2);
+  color: var(--c-text-2);
 }
 .ms-btn--solo:hover  { border-color: #ffcc00; color: #ffcc00; }
 .ms-btn--solo.active { background: #ffcc0022; border-color: #ffcc00; color: #ffcc00; }
 
 .chevron {
-  color: var(--group-color);
+  color: var(--c-group-label, var(--group-color));
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }
@@ -144,7 +143,7 @@ const { open: openGroupModal } = useGroupModal()
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--group-color);
+  color: var(--c-group-label, var(--group-color));
   flex-shrink: 0;
   transition: opacity 0.15s;
 }
@@ -158,5 +157,4 @@ const { open: openGroupModal } = useGroupModal()
 .group-content {
   padding-bottom: 4px;
 }
-
 </style>

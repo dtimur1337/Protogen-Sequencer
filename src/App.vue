@@ -1,6 +1,6 @@
 <template>
-  <v-app theme="sequencerTheme">
-    <v-app-bar flat color="#080c16" border="b" :border-color="'#1a2540'">
+  <v-app :theme="currentVuetifyTheme">
+    <v-app-bar flat color="surface" border="b">
       <v-app-bar-title>
         <h1 class="app-title">PROTOGEN SEQUENCER</h1>
       </v-app-bar-title>
@@ -8,11 +8,14 @@
         <div class="header-actions">
           <button class="header-btn" @click="resetTrack">NEW TRACK</button>
           <button class="header-btn header-btn--accent" @click="handleLoadDemo">DEMO TRACK</button>
+          <button class="theme-toggle" :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'" @click="toggleTheme">
+            <v-icon size="18">{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
+          </button>
         </div>
       </template>
     </v-app-bar>
 
-    <v-main style="background: #0a0e1a;">
+    <v-main :style="{ background: 'var(--c-bg)' }">
       <TransportBar />
       <v-container fluid class="pa-4 pa-md-6" style="padding-bottom: 34px;">
         <SequencerGrid />
@@ -36,21 +39,20 @@ import { useSequencer } from './composables/useSequencer'
 import { useSyncScroll } from './composables/useSyncScroll'
 import { useVolumeModal } from './composables/useVolumeModal'
 import { useGroupModal } from './composables/useGroupModal'
+import { useTheme } from './composables/useTheme'
 import demoPreset from './presets/demo.json'
 
 const { resetTrack, loadPreset, steps } = useSequencer()
 const { register, unregister, onScroll } = useSyncScroll()
 const { show: showModal } = useVolumeModal()
 const { activeGroupId } = useGroupModal()
+const { isDark, vuetifyTheme: currentVuetifyTheme, toggle: toggleTheme } = useTheme()
 
 function handleLoadDemo() { loadPreset(demoPreset) }
 
 const scrollBarRef = ref(null)
 
-// Same geometry as PianoRollGroup / LaneRow pad groups
 const PAD_W = 36, GAP_IN = 4, GAP_OUT = 8
-// 186px = fixed left offset (container padding 24 + group-panel padding 14 + border 2 + lane-name 110 + gap 12 + container right padding 24)
-// Adding this aligns the scrollbar's max-scroll with the pads-scroll max-scroll
 const SCROLL_LEFT_OFFSET = 186
 const stickyInnerWidth = computed(() => {
   const n = steps.value / 4
@@ -70,8 +72,8 @@ onUnmounted(() => unregister(scrollBarRef.value))
   overflow-x: auto;
   overflow-y: hidden;
   height: 20px;
-  background: #0d1420;
-  border-top: 1px solid #1a2540;
+  background: var(--c-surf);
+  border-top: 1px solid var(--c-border);
   z-index: 9;
 }
 
@@ -79,16 +81,16 @@ onUnmounted(() => unregister(scrollBarRef.value))
   height: 20px;
 }
 .sticky-scrollbar::-webkit-scrollbar-track {
-  background: #0d1420;
+  background: var(--c-surf);
 }
 .sticky-scrollbar::-webkit-scrollbar-thumb {
-  background: #2a4060;
+  background: var(--c-border-5);
   border-radius: 10px;
-  border: 7px solid #0d1420;
+  border: 7px solid var(--c-surf);
   background-clip: padding-box;
 }
 .sticky-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #3a5878;
+  background: var(--c-border-3);
   background-clip: padding-box;
 }
 
@@ -101,7 +103,7 @@ onUnmounted(() => unregister(scrollBarRef.value))
   font-weight: 700;
   font-size: 1rem;
   letter-spacing: 0.25em;
-  color: #ff6b2b;
+  color: var(--c-accent);
   margin: 0;
   line-height: 1;
 }
@@ -120,27 +122,48 @@ onUnmounted(() => unregister(scrollBarRef.value))
   letter-spacing: 0.15em;
   padding: 6px 14px;
   background: transparent;
-  border: 1px solid #253550;
+  border: 1px solid var(--c-border-2);
   border-radius: 2px;
-  color: #7a9ab8;
+  color: var(--c-text-2);
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
 }
 
 .header-btn:hover {
-  border-color: #3a5878;
-  color: #a8c8e0;
-  background: #0d1a2a;
+  border-color: var(--c-border-3);
+  color: var(--c-text-1);
+  background: var(--c-pad);
 }
 
 .header-btn--accent {
-  border-color: #d0602880;
-  color: #d06028;
+  border-color: var(--c-accent-dim);
+  color: var(--c-accent-dim);
 }
 
 .header-btn--accent:hover {
-  border-color: #ff6b2b;
-  color: #ff6b2b;
-  background: #ff6b2b12;
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: var(--c-accent-bg);
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--c-border-2);
+  border-radius: 50%;
+  color: var(--c-text-2);
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: var(--c-accent-bg);
 }
 </style>

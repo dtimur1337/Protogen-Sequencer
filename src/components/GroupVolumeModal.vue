@@ -64,7 +64,7 @@ const group = computed(() => GROUPS.find(g => g.id === activeGroupId.value))
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: #00000088;
+  background: var(--c-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,8 +72,8 @@ const group = computed(() => GROUPS.find(g => g.id === activeGroupId.value))
 }
 
 .modal-card {
-  background: #0d1420;
-  border: 1px solid #1a2540;
+  background: var(--c-surf);
+  border: 1px solid var(--c-border);
   border-top: 2px solid var(--group-color);
   border-radius: 4px;
   max-width: 90vw;
@@ -84,7 +84,7 @@ const group = computed(() => GROUPS.find(g => g.id === activeGroupId.value))
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px 10px;
-  border-bottom: 1px solid #1a2540;
+  border-bottom: 1px solid var(--c-border);
 }
 
 .modal-title {
@@ -92,19 +92,19 @@ const group = computed(() => GROUPS.find(g => g.id === activeGroupId.value))
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2em;
-  color: var(--group-color);
+  color: var(--c-text-2);
 }
 
 .modal-close {
   background: transparent;
   border: none;
-  color: #5a7a9a;
+  color: var(--c-text-3);
   font-size: 14px;
   cursor: pointer;
   padding: 2px 6px;
   line-height: 1;
 }
-.modal-close:hover { color: #a8c8e0; }
+.modal-close:hover { color: var(--c-text-1); }
 
 .modal-body {
   padding: 24px 24px 32px;
@@ -139,7 +139,7 @@ const group = computed(() => GROUPS.find(g => g.id === activeGroupId.value))
 .fader-val {
   font-family: 'Courier New', monospace;
   font-size: 9px;
-  color: #7a9ab8;
+  color: var(--c-text-2);
   min-width: 24px;
   text-align: center;
 }
@@ -149,7 +149,7 @@ const group = computed(() => GROUPS.find(g => g.id === activeGroupId.value))
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #7a9ab8;
+  color: var(--c-text-2);
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -157,7 +157,7 @@ const group = computed(() => GROUPS.find(g => g.id === activeGroupId.value))
 .fader-divider {
   width: 1px;
   height: 100px;
-  background: #1a2540;
+  background: var(--c-border);
   margin: 0 4px;
   align-self: center;
 }

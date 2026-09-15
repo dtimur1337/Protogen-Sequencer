@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="notePicker.open" max-width="460" @keydown.esc="notePicker.open = false">
-    <v-card color="#0d1420" border style="border-color: #1a2540 !important;">
+    <v-card color="surface" border style="border-color: var(--c-border) !important;">
       <v-card-title class="modal-title">SELECT NOTE</v-card-title>
       <v-card-text class="pb-6">
         <div class="piano">
@@ -51,7 +51,6 @@ const GAP = 1
 const STEP = WHITE_W + GAP
 const BLACK_W = 18
 
-// x offset of each black key relative to octave start (left edge of C)
 const BLACK_KEY_DEFS = [
   { name: 'C#', x: 1 * STEP - BLACK_W / 2 },
   { name: 'D#', x: 2 * STEP - BLACK_W / 2 },
@@ -73,7 +72,7 @@ function blackKeys(octave) {
   font-family: 'Courier New', monospace;
   font-size: 10px !important;
   letter-spacing: 0.2em;
-  color: #00d4ff;
+  color: var(--c-accent);
   padding-top: 16px;
 }
 
@@ -94,7 +93,7 @@ function blackKeys(octave) {
 .octave-label {
   font-family: 'Courier New', monospace;
   font-size: 9px;
-  color: #3a5070;
+  color: var(--c-text-3);
   margin-bottom: 4px;
   letter-spacing: 0.1em;
 }
@@ -108,8 +107,8 @@ function blackKeys(octave) {
   display: inline-block;
   width: 28px;
   height: 84px;
-  background: #d0d8e8;
-  border: 1px solid #5a6a7a;
+  background: var(--c-key-w);
+  border: 1px solid var(--c-border-2);
   border-radius: 0 0 3px 3px;
   margin-right: 1px;
   cursor: pointer;
@@ -119,12 +118,12 @@ function blackKeys(octave) {
 }
 
 .white-key:hover {
-  background: #e8f0ff;
+  background: var(--c-key-w-h);
 }
 
 .white-key.selected {
-  background: #00d4ff;
-  border-color: #00aad4;
+  background: var(--c-accent);
+  border-color: var(--c-accent-dim);
 }
 
 .black-key {
@@ -132,8 +131,8 @@ function blackKeys(octave) {
   top: 0;
   width: 18px;
   height: 52px;
-  background: #111827;
-  border: 1px solid #3a5070;
+  background: var(--c-key-b);
+  border: 1px solid var(--c-border-4);
   border-radius: 0 0 2px 2px;
   cursor: pointer;
   z-index: 2;
@@ -141,12 +140,12 @@ function blackKeys(octave) {
 }
 
 .black-key:hover {
-  background: #1e2d45;
+  background: var(--c-key-b-h);
 }
 
 .black-key.selected {
-  background: #00a4c4;
-  border-color: #00d4ff;
+  background: var(--c-accent-dim);
+  border-color: var(--c-accent);
 }
 
 .key-label {
@@ -156,13 +155,13 @@ function blackKeys(octave) {
   transform: translateX(-50%);
   font-family: 'Courier New', monospace;
   font-size: 7px;
-  color: #5a7090;
+  color: var(--c-text-3);
   pointer-events: none;
   white-space: nowrap;
 }
 
 .black-label {
-  color: #4a8090;
+  color: var(--c-key-b-text);
   font-size: 6px;
 }
 
@@ -170,11 +169,11 @@ function blackKeys(octave) {
   text-align: center;
   font-family: 'Courier New', monospace;
   font-size: 11px;
-  color: #3a5070;
+  color: var(--c-text-3);
   margin-top: 8px;
 }
 
 .current-note strong {
-  color: #00d4ff;
+  color: var(--c-accent);
 }
 </style>
