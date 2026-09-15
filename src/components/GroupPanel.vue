@@ -15,6 +15,7 @@
       </button>
       <div class="group-divider" />
       <div class="group-ms">
+        <button class="ms-btn ms-btn--vol" :aria-label="`Volume for ${group.name}`" @click="openGroupModal(group.id)">VOL &amp; REV</button>
         <button
           class="ms-btn ms-btn--mute"
           :class="{ active: groupMutes[group.id] }"
@@ -32,34 +33,6 @@
 
     <v-expand-transition>
       <div v-if="expanded" class="group-content">
-        <!-- Group-level VOL + REV controls for non-pitched groups (Drums, FX) -->
-        <div v-if="!group.hasNotes" class="group-controls">
-          <div class="ctrl-row">
-            <span class="ctrl-label">VOL</span>
-            <v-slider
-              v-model="groupVolumes[group.id]"
-              min="0" max="100" step="1"
-              hide-details density="compact"
-              :color="group.color"
-              class="ctrl-slider"
-              thumb-size="12"
-              :aria-label="`${group.name} volume`"
-            />
-          </div>
-          <div class="ctrl-row">
-            <span class="ctrl-label">REV</span>
-            <v-slider
-              v-model="groupReverbSends[group.id]"
-              min="0" max="100" step="1"
-              hide-details density="compact"
-              color="secondary"
-              class="ctrl-slider"
-              thumb-size="12"
-              :aria-label="`${group.name} reverb`"
-            />
-          </div>
-        </div>
-
         <slot />
       </div>
     </v-expand-transition>
@@ -69,17 +42,19 @@
 <script setup>
 import { ref } from 'vue'
 import { useSequencer } from '../composables/useSequencer'
+import { useGroupModal } from '../composables/useGroupModal'
 
-defineProps({ group: { type: Object, required: true } })
+const props = defineProps({ group: { type: Object, required: true } })
 const expanded = ref(true)
-const { groupVolumes, groupReverbSends, groupMutes, groupSolos, toggleMute, toggleSolo } = useSequencer()
+const { groupMutes, groupSolos, toggleMute, toggleSolo } = useSequencer()
+const { open: openGroupModal } = useGroupModal()
 </script>
 
 <style scoped>
 .group-panel {
   border-left: 2px solid var(--group-color);
   padding-left: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
 }
 
 .group-header {
@@ -114,11 +89,11 @@ const { groupVolumes, groupReverbSends, groupMutes, groupSolos, toggleMute, togg
 
 .ms-btn {
   font-family: 'Courier New', monospace;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
-  width: 22px;
-  height: 18px;
+  width: 24px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,10 +102,20 @@ const { groupVolumes, groupReverbSends, groupMutes, groupSolos, toggleMute, togg
   transition: background 0.1s, border-color 0.1s, color 0.1s;
 }
 
+.ms-btn--vol {
+  background: transparent;
+  border: 1px solid #3a4560;
+  color: #7a9ab8;
+  width: auto;
+  padding: 0 6px;
+  letter-spacing: 0.05em;
+}
+.ms-btn--vol:hover { border-color: #ff6b2b; color: #ff6b2b; }
+
 .ms-btn--mute {
   background: transparent;
   border: 1px solid #3a4560;
-  color: #5a7a9a;
+  color: #7a9ab8;
 }
 .ms-btn--mute:hover  { border-color: #ff8844; color: #ff8844; }
 .ms-btn--mute.active { background: #ff884422; border-color: #ff8844; color: #ff8844; }
@@ -138,7 +123,7 @@ const { groupVolumes, groupReverbSends, groupMutes, groupSolos, toggleMute, togg
 .ms-btn--solo {
   background: transparent;
   border: 1px solid #3a4560;
-  color: #5a7a9a;
+  color: #7a9ab8;
 }
 .ms-btn--solo:hover  { border-color: #ffcc00; color: #ffcc00; }
 .ms-btn--solo.active { background: #ffcc0022; border-color: #ffcc00; color: #ffcc00; }
@@ -174,39 +159,4 @@ const { groupVolumes, groupReverbSends, groupMutes, groupSolos, toggleMute, togg
   padding-bottom: 4px;
 }
 
-/* Group-level controls for non-pitched groups — styled as transport bar */
-.group-controls {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 8px 16px;
-  background: #0d1420;
-  border-top: 1px solid #1a2540;
-  border-bottom: 1px solid #1a2540;
-  margin: 6px 0 10px -14px;
-  width: calc(100% + 14px);
-  box-sizing: border-box;
-}
-
-.ctrl-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: 240px;
-  flex-shrink: 0;
-}
-
-.ctrl-label {
-  font-family: 'Courier New', monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  font-weight: 600;
-  color: #8ab4d8;
-  flex-shrink: 0;
-  width: 28px;
-}
-
-.ctrl-slider {
-  flex: 1;
-}
 </style>

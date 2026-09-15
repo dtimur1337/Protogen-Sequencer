@@ -19,51 +19,44 @@
       <span v-else class="lane-name">{{ lane.name }}</span>
     </div>
 
-    <div class="pads-area">
-      <div v-for="(group, gi) in padGroups" :key="gi" class="pad-group">
-        <PadButton
-          v-for="(stepIdx, si) in group"
-          :key="stepIdx"
-          :active="pads[lane.id]?.[stepIdx]?.active ?? false"
-          :is-current="currentStep === stepIdx"
-          :color="color"
-          :lane-name="lane.name"
-          :step-num="stepIdx + 1"
-          @mousedown.prevent="startDrag(lane.id, stepIdx)"
-          @mouseenter="enterDrag(lane.id, stepIdx)"
-          @click="handleClick(lane.id, stepIdx, $event)"
-        />
+    <div class="pads-scroll" ref="padScrollRef" @scroll.passive="onScroll">
+      <div class="pads-area">
+        <div v-for="(group, gi) in padGroups" :key="gi" class="pad-group">
+          <PadButton
+            v-for="(stepIdx, si) in group"
+            :key="stepIdx"
+            :active="pads[lane.id]?.[stepIdx]?.active ?? false"
+            :is-current="currentStep === stepIdx"
+            :color="color"
+            :lane-name="lane.name"
+            :step-num="stepIdx + 1"
+            @mousedown.prevent="startDrag(lane.id, stepIdx)"
+            @mouseenter="enterDrag(lane.id, stepIdx)"
+            @click="handleClick(lane.id, stepIdx, $event)"
+          />
+        </div>
       </div>
     </div>
 
-    <div class="lane-controls">
-      <div class="control-group">
-        <v-slider
-          v-model="laneSettings[lane.id].volume"
-          min="0" max="100" step="1"
-          hide-details density="compact"
-          :color="color"
-          class="ctrl-slider"
-          thumb-size="12"
-          :aria-label="`Volume for ${lane.name}`"
-        />
-        <span class="ctrl-label" aria-hidden="true">VOL</span>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import PadButton from './PadButton.vue'
 import { useSequencer } from '../composables/useSequencer'
+import { useSyncScroll } from '../composables/useSyncScroll'
 
 defineProps({
   lane:  { type: Object, required: true },
   color: { type: String, default: '#ff6b2b' },
 })
 
-const { pads, laneSettings, laneSampleSelections, currentStep, steps, togglePad, setLaneSample } = useSequencer()
+const { pads, laneSampleSelections, currentStep, steps, togglePad, setLaneSample } = useSequencer()
+const { register, unregister, onScroll } = useSyncScroll()
+const padScrollRef = ref(null)
+onMounted(() => register(padScrollRef.value))
+onUnmounted(() => unregister(padScrollRef.value))
 
 const padGroups = computed(() =>
   Array.from({ length: steps.value / 4 }, (_, g) =>
@@ -106,7 +99,16 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   align-items: center;
   gap: 12px;
   padding: 4px 0;
+  width: 100%;
 }
+
+.pads-scroll {
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-width: 0;
+}
+.pads-scroll::-webkit-scrollbar { display: none; }
 
 .lane-name-cell {
   width: 110px;
@@ -169,7 +171,6 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 .pads-area {
   display: flex;
   gap: 8px;
-  flex-shrink: 0;
 }
 
 .pad-group {
@@ -177,32 +178,4 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   gap: 4px;
 }
 
-.lane-controls {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-  align-items: center;
-}
-
-.control-group {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  width: 240px;
-  flex-shrink: 0;
-}
-
-.ctrl-slider {
-  flex: 1;
-}
-
-.ctrl-label {
-  font-family: 'Courier New', monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  font-weight: 600;
-  color: #8ab4d8;
-  flex-shrink: 0;
-  width: 28px;
-}
 </style>

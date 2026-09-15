@@ -10,66 +10,53 @@
       <span class="play-label">{{ isLoading ? 'LOADING…' : isPlaying ? 'STOP' : 'PLAY' }}</span>
     </button>
 
-    <div class="bpm-control">
+    <button class="mixer-btn" @click="openMixer">
+      <v-icon size="18">mdi-tune</v-icon>
+      MIXER
+    </button>
+
+    <div class="transport-frame">
       <span class="transport-label">BPM</span>
-      <v-slider
-        v-model="bpm"
-        min="60" max="180" step="1"
-        hide-details density="compact"
-        color="primary"
-        class="bpm-slider"
-        thumb-size="12"
+      <input
+        v-model.number="bpm"
+        type="number"
+        min="60" max="300" step="1"
+        class="bpm-input"
         aria-label="Tempo in BPM"
-      />
-    </div>
-    <span class="bpm-value">{{ bpm }}</span>
-
-    <div class="vol-control">
-      <span class="transport-label">VOL</span>
-      <v-slider
-        v-model="masterVolume"
-        min="0" max="100" step="1"
-        hide-details density="compact"
-        color="secondary"
-        class="vol-slider"
-        thumb-size="12"
-        aria-label="Master volume"
+        @change="bpm = Math.min(300, Math.max(60, bpm))"
       />
     </div>
 
-    <div class="steps-toggle">
-      <button
-        v-for="n in [16, 32]"
-        :key="n"
-        class="steps-btn"
-        :class="{ active: steps === n }"
-        @click="setSteps(n)"
-      >{{ n }}</button>
+    <div class="transport-frame">
+      <span class="transport-label">STEPS</span>
+      <div class="steps-toggle">
+        <button
+          v-for="n in [16, 32, 64]"
+          :key="n"
+          class="steps-btn"
+          :class="{ active: steps === n }"
+          @click="setSteps(n)"
+        >{{ n }}</button>
+      </div>
     </div>
 
-    <div class="step-indicators">
-      <div
-        v-for="i in steps"
-        :key="i"
-        class="step-dot"
-        :class="{ active: currentStep === i - 1, small: steps === 32 }"
-      />
-    </div>
   </div>
 </template>
 
 <script setup>
 import { useSequencer } from '../composables/useSequencer'
+import { useVolumeModal } from '../composables/useVolumeModal'
 
-const { isPlaying, isLoading, currentStep, bpm, masterVolume, steps, play, stop, setSteps } = useSequencer()
+const { isPlaying, isLoading, bpm, steps, play, stop, setSteps } = useSequencer()
+const { open: openMixer } = useVolumeModal()
 </script>
 
 <style scoped>
 .transport {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 12px 16px;
+  gap: 16px;
+  padding: 16px;
   background: #0d1420;
   border-bottom: 1px solid #1a2540;
   position: sticky;
@@ -81,7 +68,8 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, steps, play, stop,
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  height: 48px;
+  padding: 0 16px;
   background: transparent;
   border: 1px solid #ff6b2b;
   border-radius: 3px;
@@ -118,24 +106,40 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, steps, play, stop,
   font-weight: 700;
 }
 
-.bpm-control {
+.mixer-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  width: 240px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 0 14px;
+  height: 48px;
+  background: transparent;
+  border: 1px solid #253550;
+  border-radius: 3px;
+  color: #7a9ab8;
+  cursor: pointer;
   flex-shrink: 0;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.mixer-btn:hover {
+  border-color: #3a5878;
+  color: #a8c8e0;
+  background: #0d1a2a;
 }
 
-.vol-control {
+.transport-frame {
   display: flex;
   align-items: center;
-  gap: 6px;
-  width: 240px;
+  gap: 8px;
+  height: 48px;
+  padding: 8px;
+  border: 1px solid #25355080;
+  border-radius: 3px;
   flex-shrink: 0;
-}
-
-.vol-slider {
-  flex: 1;
+  box-sizing: border-box;
 }
 
 .transport-label {
@@ -145,27 +149,32 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, steps, play, stop,
   font-weight: 600;
   color: #8ab4d8;
   flex-shrink: 0;
-  width: 28px;
 }
 
-.bpm-slider {
-  flex: 1;
-}
-
-.bpm-value {
+.bpm-input {
   font-family: 'Courier New', monospace;
   font-size: 13px;
   font-weight: 700;
   color: #ff6b2b;
-  width: 30px;
-  text-align: right;
-  flex-shrink: 0;
+  background: #080c16;
+  border: 1px solid #253550;
+  border-radius: 2px;
+  width: 56px;
+  padding: 3px 6px;
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
 }
+.bpm-input::-webkit-outer-spin-button,
+.bpm-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.bpm-input:focus { border-color: #ff6b2b; }
 
 .steps-toggle {
   display: flex;
   gap: 4px;
   flex-shrink: 0;
+  align-self: stretch;
+  align-items: stretch;
 }
 
 .steps-btn {
@@ -173,11 +182,11 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, steps, play, stop,
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  padding: 3px 8px;
+  padding: 0 8px;
   background: transparent;
   border: 1px solid #253550;
   border-radius: 2px;
-  color: #5a7a9a;
+  color: #7a9ab8;
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
 }
@@ -193,33 +202,4 @@ const { isPlaying, isLoading, currentStep, bpm, masterVolume, steps, play, stop,
   color: #ff6b2b;
 }
 
-.step-indicators {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-  flex-wrap: nowrap;
-}
-
-.step-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #1a2540;
-  transition: background 0.05s;
-  flex-shrink: 0;
-}
-
-.step-dot.small {
-  width: 4px;
-  height: 4px;
-}
-
-.step-dot:nth-child(4n+1) {
-  background: #1e3050;
-}
-
-.step-dot.active {
-  background: #ff6b2b;
-  box-shadow: 0 0 6px #ff6b2b88;
-}
 </style>

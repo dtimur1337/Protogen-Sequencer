@@ -1,4 +1,4 @@
-export const STEPS = 32  // max pre-allocated steps
+export const STEPS = 64  // max pre-allocated steps
 export const ROOT_NOTE = 'C3'
 
 export const GROUPS = [
@@ -10,12 +10,12 @@ export const GROUPS = [
     lanes: [
       {
         id: 'kick', name: 'Kick',
-        sample: new URL('../assets/samples/Drums/Kick/KIC 1.wav', import.meta.url).href,
+        sample: new URL('../assets/samples/Drums/Kick/Kick_1.wav', import.meta.url).href,
         options: [
-          { label: 'KIC 1', sample: new URL('../assets/samples/Drums/Kick/KIC 1.wav', import.meta.url).href },
-          { label: 'KIC 2', sample: new URL('../assets/samples/Drums/Kick/KIC 2.wav', import.meta.url).href },
-          { label: 'KIC 3', sample: new URL('../assets/samples/Drums/Kick/KIC 3.wav', import.meta.url).href },
-          { label: 'KIC 4', sample: new URL('../assets/samples/Drums/Kick/KIC 4.wav', import.meta.url).href },
+          { label: 'KIC 1', sample: new URL('../assets/samples/Drums/Kick/Kick_1.wav', import.meta.url).href },
+          { label: 'KIC 2', sample: new URL('../assets/samples/Drums/Kick/Kick_2.wav', import.meta.url).href },
+          { label: 'KIC 3', sample: new URL('../assets/samples/Drums/Kick/Kick_3.wav', import.meta.url).href },
+          { label: 'KIC 4', sample: new URL('../assets/samples/Drums/Kick/Kick_4.wav', import.meta.url).href },
         ],
       },
       {

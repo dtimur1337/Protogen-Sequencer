@@ -1,6 +1,6 @@
 <template>
   <div class="sequencer-grid">
-    <GroupPanel v-for="group in GROUPS" :key="group.id" :group="group">
+    <GroupPanel v-for="group in GROUPS.filter(g => g.id !== 'fx')" :key="group.id" :group="group">
       <!-- Piano roll for pitched groups (Bass, Melodics) -->
       <PianoRollGroup v-if="group.hasNotes" :group="group" />
 
@@ -26,9 +26,7 @@ import { GROUPS } from '../config/samples'
 
 <style scoped>
 .sequencer-grid {
-  overflow-x: auto;
   padding: 8px 0;
-  display: grid;
-  grid-template-columns: minmax(max-content, 1fr);
+  width: 100%;
 }
 </style>

@@ -16,102 +16,69 @@
         </button>
       </div>
 
-      <div class="roll-controls">
-        <div class="ctrl-row">
-          <span class="ctrl-label">VOL</span>
-          <v-slider
-            v-model="laneSettings[selectedSample[group.id]].volume"
-            min="0" max="100" step="1"
-            hide-details density="compact"
-            :color="group.color"
-            class="ctrl-slider"
-            thumb-size="12"
-            :aria-label="`Volume for ${group.name}`"
-          />
-        </div>
-        <div class="ctrl-row">
-          <span class="ctrl-label">REV</span>
-          <v-slider
-            v-model="groupReverbSends[group.id]"
-            min="0" max="100" step="1"
-            hide-details density="compact"
-            color="secondary"
-            class="ctrl-slider"
-            thumb-size="12"
-            :aria-label="`Reverb for ${group.name}`"
-          />
-        </div>
-      </div>
     </div>
 
-    <!-- Piano roll grid -->
-    <div
-      class="roll-grid"
-      role="grid"
-      :aria-label="`${group.name} piano roll`"
-      @mouseup="endDrag"
-      @mouseleave="endDrag"
-    >
-      <template v-for="note in displayNotes" :key="note">
-      <div v-if="isC(note)" class="octave-sep" aria-hidden="true" />
-      <div
-        class="note-row"
-        :class="{
-          'note-row--black': isBlack(note),
-          'note-row--c':     isC(note),
-        }"
-        role="row"
-        :aria-label="note"
-      >
-        <!-- Piano key strip — clickable to audition -->
-        <button
-          class="key-strip"
-          :class="{ 'key-strip--black': isBlack(note), 'key-strip--c': isC(note) }"
-          :aria-label="`Play ${note}`"
-          @mousedown.prevent="previewNote(group.id, note)"
-        >
-          <span class="key-name">{{ keyLabel(note) }}</span>
-        </button>
+    <!-- Piano roll: fixed key column + scrollable step column -->
+    <div class="roll-body" @mouseup="endDrag" @mouseleave="endDrag">
+      <!-- Keys (fixed left) -->
+      <div class="key-col">
+        <template v-for="note in displayNotes" :key="'k-' + note">
+          <div v-if="isC(note)" class="octave-sep" aria-hidden="true" />
+          <button
+            class="key-strip"
+            :class="{ 'key-strip--black': isBlack(note), 'key-strip--c': isC(note) }"
+            :aria-label="`Play ${note}`"
+            @mousedown.prevent="previewNote(group.id, note)"
+          >
+            <span class="key-name">{{ keyLabel(note) }}</span>
+          </button>
+        </template>
+      </div>
 
-        <!-- Step area: transparent click grid + note bars -->
-        <div class="step-area" :style="{ width: stepAreaWidth + 'px' }">
-          <!-- Interaction layer (transparent cells for mouse events) -->
-          <div class="click-grid">
-            <div v-for="g in numGroups" :key="g" class="step-group">
-              <button
-                v-for="s in 4"
-                :key="s"
-                class="grid-cell"
-                :class="{ 'grid-cell--current': currentStep === si(g, s) }"
-                :aria-label="`${note} step ${si(g, s) + 1}, ${isActive(noteIdx(note), si(g, s)) ? 'on' : 'off'}`"
-                :aria-pressed="isActive(noteIdx(note), si(g, s))"
-                role="gridcell"
-                @mousedown.prevent="startDrag(noteIdx(note), si(g, s))"
-                @mouseenter="enterPad(noteIdx(note), si(g, s))"
-              />
+      <!-- Steps (scrollable) -->
+      <div class="steps-scroll" ref="stepsScrollRef" @scroll.passive="onScroll">
+        <div class="steps-inner" role="grid" :aria-label="`${group.name} piano roll`">
+          <template v-for="note in displayNotes" :key="'s-' + note">
+            <div v-if="isC(note)" class="octave-sep" aria-hidden="true" />
+            <div class="step-row" :class="{ 'step-row--black': isBlack(note) }" role="row" :aria-label="note">
+              <div class="step-area" :style="{ width: stepAreaWidth + 'px' }">
+                <div class="click-grid">
+                  <div v-for="g in numGroups" :key="g" class="step-group">
+                    <button
+                      v-for="s in 4"
+                      :key="s"
+                      class="grid-cell"
+                      :class="{ 'grid-cell--current': currentStep === si(g, s) }"
+                      :aria-label="`${note} step ${si(g, s) + 1}, ${isActive(noteIdx(note), si(g, s)) ? 'on' : 'off'}`"
+                      :aria-pressed="isActive(noteIdx(note), si(g, s))"
+                      role="gridcell"
+                      @mousedown.prevent="startDrag(noteIdx(note), si(g, s))"
+                      @mouseenter="enterPad(noteIdx(note), si(g, s))"
+                    />
+                  </div>
+                </div>
+                <div class="note-layer" aria-hidden="true">
+                  <div
+                    v-for="bar in rowNotes(noteIdx(note))"
+                    :key="bar.startStep"
+                    class="note-bar"
+                    :class="{ 'note-bar--current': currentStep >= bar.startStep && currentStep < bar.startStep + bar.duration }"
+                    :style="{ ...noteBarStyle(bar), '--group-color': group.color }"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-
-          <!-- Visual note bars (no pointer events) -->
-          <div class="note-layer" aria-hidden="true">
-            <div
-              v-for="bar in rowNotes(noteIdx(note))"
-              :key="bar.startStep"
-              class="note-bar"
-              :class="{ 'note-bar--current': currentStep >= bar.startStep && currentStep < bar.startStep + bar.duration }"
-              :style="{ ...noteBarStyle(bar), '--group-color': group.color }"
-            />
-          </div>
+          </template>
         </div>
       </div>
-      </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useSequencer, PIANO_NOTES } from '../composables/useSequencer'
+import { useSyncScroll } from '../composables/useSyncScroll'
 
 const PAD_W = 36   // px — must match .grid-cell width
 const GAP_IN = 4   // px — gap within a step-group
@@ -125,7 +92,11 @@ function stepX(s) {
 
 const props = defineProps({ group: { type: Object, required: true } })
 
-const { pianoRoll, selectedSample, laneSettings, groupReverbSends, currentStep, steps, setPianoNote, setSelectedSample, previewNote } = useSequencer()
+const { pianoRoll, selectedSample, currentStep, steps, setPianoNote, setSelectedSample, previewNote } = useSequencer()
+const { register, unregister, onScroll } = useSyncScroll()
+const stepsScrollRef = ref(null)
+onMounted(() => register(stepsScrollRef.value))
+onUnmounted(() => { unregister(stepsScrollRef.value); window.removeEventListener('mouseup', endDrag) })
 
 const numGroups = computed(() => steps.value / 4)
 const stepAreaWidth = computed(() => {
@@ -221,7 +192,6 @@ function enterPad(ni, stepIdx) {
 function endDrag() { drag.value.active = false }
 
 window.addEventListener('mouseup', endDrag)
-onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 </script>
 
 <style scoped>
@@ -255,59 +225,63 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
   border: 1px solid #253550;
   border-radius: 2px;
   background: #0d1522;
-  color: #5a7a9a;
+  color: #7a9ab8;
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
   text-transform: uppercase;
 }
-.sample-tab:hover { border-color: #3a5878; color: #7a9ab8; }
+.sample-tab:hover { border-color: #3a5878; color: #a8c8e0; }
 .sample-tab.active {
   border-color: v-bind('group.color');
   background: color-mix(in srgb, v-bind('group.color') 15%, #0d1522);
   color: v-bind('group.color');
 }
 
-.roll-controls { display: flex; gap: 12px; flex-shrink: 0; }
-.ctrl-row { display: flex; align-items: center; gap: 6px; width: 240px; flex-shrink: 0; }
-.ctrl-label {
-  font-family: 'Courier New', monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  font-weight: 600;
-  color: #8ab4d8;
-  flex-shrink: 0;
-  width: 28px;
-}
-.ctrl-slider { flex: 1; }
-
-/* --- Roll grid --- */
-.roll-grid {
+/* --- Two-column roll layout --- */
+.roll-body {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: fit-content;
+  gap: 12px;
   user-select: none;
 }
 
-.note-row {
+.key-col {
+  width: 110px;
+  flex-shrink: 0;
   display: flex;
-  align-items: stretch;
-  gap: 12px;
-  height: 21px;
+  flex-direction: column;
+  gap: 4px;
 }
-.note-row--black { background: #090e18; }
-.note-row--c     {}
+
+.steps-scroll {
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-width: 0;
+}
+.steps-scroll::-webkit-scrollbar { display: none; }
+
+.steps-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.step-row {
+  height: 24px;
+}
+.step-row--black { background: #090e18; }
+
 .octave-sep {
   height: 1px;
   background: #253550;
   opacity: 0.5;
-  align-self: stretch;
   margin: 2px 0;
 }
 
 /* --- Key strip (now a button for audition) --- */
 .key-strip {
   width: 110px;
+  height: 24px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -335,18 +309,19 @@ onUnmounted(() => window.removeEventListener('mouseup', endDrag))
 
 .key-name {
   font-family: 'Courier New', monospace;
-  font-size: 9px;
+  font-size: 10px;
   color: #7ab0d4;
   pointer-events: none;
   white-space: nowrap;
 }
-.note-row--c .key-name       { color: #a8d4f0; font-weight: 700; }
-.key-strip--black .key-name  { color: #4a6a88; font-size: 8px; }
+.key-strip--c .key-name      { color: #a8d4f0; font-weight: 700; }
+.key-strip--black .key-name  { color: #5a8aaa; font-size: 10px; }
 
 /* --- Step area --- */
 .step-area {
   position: relative;
   flex-shrink: 0;
+  height: 100%;
 }
 
 /* --- Click grid (transparent interaction layer) --- */
