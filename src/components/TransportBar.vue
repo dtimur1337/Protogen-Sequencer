@@ -7,12 +7,12 @@
       @click="isPlaying ? stop() : play()"
     >
       <v-icon size="20">{{ isPlaying ? 'mdi-stop' : 'mdi-play' }}</v-icon>
-      <span class="play-label">{{ isLoading ? 'LOADING…' : isPlaying ? 'STOP' : 'PLAY' }}</span>
+      <span class="play-label" aria-hidden="true">{{ isLoading ? 'LOADING…' : isPlaying ? 'STOP' : 'PLAY' }}</span>
     </button>
 
-    <button class="mixer-btn" @click="openMixer">
+    <button class="mixer-btn" @click="openMixer" aria-label="Mixer">
       <v-icon size="18">mdi-tune</v-icon>
-      MIXER
+      <span class="mixer-label">MIXER</span>
     </button>
 
     <div class="transport-frame">
@@ -201,5 +201,16 @@ const { open: openMixer } = useVolumeModal()
   border-color: var(--c-accent);
   background: var(--c-accent-bg);
   color: var(--c-accent);
+}
+
+@media (max-width: 599px) {
+  .transport { gap: 8px; padding: 10px 12px; flex-wrap: nowrap; }
+  .play-label { display: none; }
+  .play-btn { padding: 0; width: 48px; justify-content: center; flex-shrink: 0; }
+  .mixer-label { display: none; }
+  .mixer-btn { padding: 0; width: 44px; justify-content: center; flex-shrink: 0; }
+  .steps-btn { padding: 0 5px; }
+  .transport-frame { padding: 6px; }
+  .transport-label { font-size: 9px; }
 }
 </style>
