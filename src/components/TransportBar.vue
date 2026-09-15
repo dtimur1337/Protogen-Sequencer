@@ -210,7 +210,7 @@ const { open: openMixer } = useVolumeModal()
   .mixer-label { display: none; }
   .mixer-btn { padding: 0; width: 44px; justify-content: center; flex-shrink: 0; }
   .steps-btn { padding: 0 5px; }
-  .transport-frame { padding: 6px; }
+  .transport-frame { padding: 6px; flex: 1; justify-content: center; }
   .transport-label { font-size: 9px; }
 }
 </style>

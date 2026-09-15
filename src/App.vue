@@ -208,7 +208,7 @@ onUnmounted(() => {
 
 .burger-dropdown {
   position: fixed;
-  top: 52px;
+  top: 60px;
   right: 8px;
   background: var(--c-surf);
   border: 1px solid var(--c-border);

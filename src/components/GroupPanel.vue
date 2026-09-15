@@ -157,4 +157,11 @@ const { open: openGroupModal } = useGroupModal()
 .group-content {
   padding-bottom: 4px;
 }
+
+@media (max-width: 599px) {
+  .group-panel {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+}
 </style>
