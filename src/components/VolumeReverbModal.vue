@@ -46,60 +46,62 @@
             </div>
           </div>
 
-          <div class="section-sep" />
+          <div class="section-sep drums-sep" />
 
-          <!-- BASS -->
-          <div class="mixer-section">
-            <div class="section-label">BASS</div>
-            <div class="faders">
-              <div class="fader">
-                <span class="fader-val">{{ groupVolumes.bass }}</span>
-                <v-slider
-                  v-model="groupVolumes.bass"
-                  direction="vertical" min="0" max="100" step="1"
-                  hide-details density="compact" thumb-size="12"
-                  color="#1e90ff" class="fader-slider"
-                />
-                <span class="fader-label">VOL</span>
-              </div>
-              <div class="fader">
-                <span class="fader-val">{{ groupReverbSends.bass }}</span>
-                <v-slider
-                  v-model="groupReverbSends.bass"
-                  direction="vertical" min="0" max="100" step="1"
-                  hide-details density="compact" thumb-size="12"
-                  color="#7a9ab8" class="fader-slider"
-                />
-                <span class="fader-label">REV</span>
+          <div class="pitched-sections">
+            <!-- BASS -->
+            <div class="mixer-section">
+              <div class="section-label">BASS</div>
+              <div class="faders">
+                <div class="fader">
+                  <span class="fader-val">{{ groupVolumes.bass }}</span>
+                  <v-slider
+                    v-model="groupVolumes.bass"
+                    direction="vertical" min="0" max="100" step="1"
+                    hide-details density="compact" thumb-size="12"
+                    color="#1e90ff" class="fader-slider"
+                  />
+                  <span class="fader-label">VOL</span>
+                </div>
+                <div class="fader">
+                  <span class="fader-val">{{ groupReverbSends.bass }}</span>
+                  <v-slider
+                    v-model="groupReverbSends.bass"
+                    direction="vertical" min="0" max="100" step="1"
+                    hide-details density="compact" thumb-size="12"
+                    color="#7a9ab8" class="fader-slider"
+                  />
+                  <span class="fader-label">REV</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="section-sep" />
+            <div class="section-sep" />
 
-          <!-- MELODICS -->
-          <div class="mixer-section">
-            <div class="section-label">MELODICS</div>
-            <div class="faders">
-              <div class="fader">
-                <span class="fader-val">{{ groupVolumes.melodics }}</span>
-                <v-slider
-                  v-model="groupVolumes.melodics"
-                  direction="vertical" min="0" max="100" step="1"
-                  hide-details density="compact" thumb-size="12"
-                  color="#00d4ff" class="fader-slider"
-                />
-                <span class="fader-label">VOL</span>
-              </div>
-              <div class="fader">
-                <span class="fader-val">{{ groupReverbSends.melodics }}</span>
-                <v-slider
-                  v-model="groupReverbSends.melodics"
-                  direction="vertical" min="0" max="100" step="1"
-                  hide-details density="compact" thumb-size="12"
-                  color="#7a9ab8" class="fader-slider"
-                />
-                <span class="fader-label">REV</span>
+            <!-- MELODICS -->
+            <div class="mixer-section">
+              <div class="section-label">MELODICS</div>
+              <div class="faders">
+                <div class="fader">
+                  <span class="fader-val">{{ groupVolumes.melodics }}</span>
+                  <v-slider
+                    v-model="groupVolumes.melodics"
+                    direction="vertical" min="0" max="100" step="1"
+                    hide-details density="compact" thumb-size="12"
+                    color="#00d4ff" class="fader-slider"
+                  />
+                  <span class="fader-label">VOL</span>
+                </div>
+                <div class="fader">
+                  <span class="fader-val">{{ groupReverbSends.melodics }}</span>
+                  <v-slider
+                    v-model="groupReverbSends.melodics"
+                    direction="vertical" min="0" max="100" step="1"
+                    hide-details density="compact" thumb-size="12"
+                    color="#7a9ab8" class="fader-slider"
+                  />
+                  <span class="fader-label">REV</span>
+                </div>
               </div>
             </div>
           </div>
@@ -243,5 +245,34 @@ const drumsLanes = GROUPS.find(g => g.id === 'drums')?.lanes ?? []
   background: var(--c-border);
   margin: 0 4px;
   align-self: center;
+}
+
+.pitched-sections {
+  display: contents;
+}
+
+@media (max-width: 599px) {
+  .modal-card {
+    min-width: 0;
+    width: 94vw;
+  }
+  .modal-body {
+    flex-direction: column;
+    padding: 20px 16px 24px;
+  }
+  .pitched-sections {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+  }
+  .drums-sep {
+    width: auto;
+    height: 1px;
+    align-self: stretch;
+    margin: 16px 0;
+  }
 }
 </style>
