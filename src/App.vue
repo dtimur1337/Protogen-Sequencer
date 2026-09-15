@@ -45,13 +45,16 @@ import { useTheme } from './composables/useTheme'
 import { saveProject, openProject, tryRestoreAutosave } from './composables/useProjectFile'
 import demoPreset from './presets/demo.json'
 
-const { resetTrack, loadPreset, steps } = useSequencer()
+const { resetTrack, loadPreset, setSteps, steps } = useSequencer()
 const { register, unregister, onScroll } = useSyncScroll()
 const { show: showModal } = useVolumeModal()
 const { activeGroupId } = useGroupModal()
 const { isDark, vuetifyTheme: currentVuetifyTheme, toggle: toggleTheme } = useTheme()
 
-function handleLoadDemo() { loadPreset(demoPreset) }
+function handleLoadDemo() {
+  if (demoPreset.steps) setSteps(demoPreset.steps)
+  loadPreset(demoPreset)
+}
 
 const scrollBarRef = ref(null)
 
