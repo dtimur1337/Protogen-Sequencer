@@ -7,6 +7,8 @@
       <template #append>
         <div class="header-actions">
           <button class="header-btn" @click="resetTrack">NEW TRACK</button>
+          <button class="header-btn" @click="openProject">OPEN</button>
+          <button class="header-btn" @click="saveProject">SAVE</button>
           <button class="header-btn header-btn--accent" @click="handleLoadDemo">DEMO TRACK</button>
           <button class="theme-toggle" :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'" @click="toggleTheme">
             <v-icon size="18">{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
@@ -40,6 +42,7 @@ import { useSyncScroll } from './composables/useSyncScroll'
 import { useVolumeModal } from './composables/useVolumeModal'
 import { useGroupModal } from './composables/useGroupModal'
 import { useTheme } from './composables/useTheme'
+import { saveProject, openProject, tryRestoreAutosave } from './composables/useProjectFile'
 import demoPreset from './presets/demo.json'
 
 const { resetTrack, loadPreset, steps } = useSequencer()
@@ -59,7 +62,10 @@ const stickyInnerWidth = computed(() => {
   return n * (4 * PAD_W + 3 * GAP_IN) + (n - 1) * GAP_OUT + SCROLL_LEFT_OFFSET
 })
 
-onMounted(() => register(scrollBarRef.value))
+onMounted(() => {
+  register(scrollBarRef.value)
+  tryRestoreAutosave()
+})
 onUnmounted(() => unregister(scrollBarRef.value))
 </script>
 
