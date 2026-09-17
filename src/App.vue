@@ -44,6 +44,7 @@
     </v-main>
     <VolumeReverbModal v-if="showModal" />
     <GroupVolumeModal v-if="activeGroupId" />
+    <TutorialOverlay />
   </v-app>
 </template>
 
@@ -53,6 +54,7 @@ import TransportBar from './components/TransportBar.vue'
 import SequencerGrid from './components/SequencerGrid.vue'
 import VolumeReverbModal from './components/VolumeReverbModal.vue'
 import GroupVolumeModal from './components/GroupVolumeModal.vue'
+import TutorialOverlay from './components/TutorialOverlay.vue'
 import { useSequencer } from './composables/useSequencer'
 import { useSyncScroll } from './composables/useSyncScroll'
 import { useVolumeModal } from './composables/useVolumeModal'
